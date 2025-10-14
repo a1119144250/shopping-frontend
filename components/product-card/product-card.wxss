@@ -1,7 +1,7 @@
 /* components/product-card/product-card.wxss */
 
 .product-card {
-  width: 340rpx;
+  width: 335rpx;
   background-color: #fff;
   border-radius: 15rpx;
   overflow: hidden;

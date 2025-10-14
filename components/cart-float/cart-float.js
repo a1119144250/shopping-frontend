@@ -53,13 +53,6 @@ Component({
       
       // 触发父组件事件
       this.triggerEvent('carttap')
-      
-      // 如果没有绑定事件，默认跳转到购物车页面
-      setTimeout(() => {
-        wx.switchTab({
-          url: '/pages/cart/cart'
-        })
-      }, 200)
     },
 
     // 显示点击动画

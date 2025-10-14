@@ -288,8 +288,20 @@ Page({
   },
 
   onCartTap() {
+    // 防止重复点击
+    if (this.cartTapLock) return
+    this.cartTapLock = true
+    
     wx.switchTab({
-      url: '/pages/cart/cart'
+      url: '/pages/cart/cart',
+      success: () => {
+        setTimeout(() => {
+          this.cartTapLock = false
+        }, 1000)
+      },
+      fail: () => {
+        this.cartTapLock = false
+      }
     })
   }
 })

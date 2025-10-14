@@ -1,0 +1,298 @@
+/* pages/search/search.wxss */
+
+.container {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 搜索头部 */
+.search-header {
+  background-color: #fff;
+  padding: 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.search-input-wrapper {
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f5;
+  border-radius: 25rpx;
+  padding: 0 20rpx;
+}
+
+.search-input {
+  flex: 1;
+  height: 70rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.search-btn {
+  padding: 10rpx 20rpx;
+  background-color: #ff6b35;
+  color: #fff;
+  font-size: 26rpx;
+  border-radius: 20rpx;
+  margin-left: 15rpx;
+}
+
+.search-btn:active {
+  background-color: #e55a2b;
+}
+
+/* 搜索历史 */
+.search-history {
+  background-color: #fff;
+  margin-bottom: 20rpx;
+  padding: 30rpx;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.history-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.history-clear {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.history-tags {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.history-tag {
+  padding: 15rpx 25rpx;
+  margin-right: 20rpx;
+  margin-bottom: 15rpx;
+  background-color: #f5f5f5;
+  color: #666;
+  font-size: 26rpx;
+  border-radius: 25rpx;
+}
+
+.history-tag:active {
+  background-color: #e9ecef;
+}
+
+/* 热门搜索 */
+.hot-search {
+  background-color: #fff;
+  margin-bottom: 20rpx;
+  padding: 30rpx;
+}
+
+.hot-header {
+  margin-bottom: 20rpx;
+}
+
+.hot-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.hot-tags {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.hot-tag {
+  padding: 15rpx 25rpx;
+  margin-right: 20rpx;
+  margin-bottom: 15rpx;
+  background-color: #fff5f0;
+  color: #ff6b35;
+  font-size: 26rpx;
+  border-radius: 25rpx;
+  border: 1rpx solid #ff6b35;
+}
+
+.hot-tag:active {
+  background-color: #ff6b35;
+  color: #fff;
+}
+
+/* 搜索结果 */
+.search-results {
+  background-color: #fff;
+  padding: 0 20rpx;
+}
+
+.results-header {
+  padding: 30rpx 0 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.results-count {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.results-list {
+  padding-top: 20rpx;
+}
+
+.result-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.result-item:last-child {
+  border-bottom: none;
+}
+
+.result-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 10rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.result-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 160rpx;
+}
+
+.result-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.result-desc {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.result-meta {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15rpx;
+}
+
+.result-sales {
+  font-size: 22rpx;
+  color: #999;
+  margin-right: 20rpx;
+}
+
+.result-rating {
+  display: flex;
+  align-items: center;
+}
+
+.rating-text {
+  font-size: 22rpx;
+  color: #ff6b35;
+  margin-right: 5rpx;
+}
+
+.rating-star {
+  font-size: 20rpx;
+  color: #ff6b35;
+}
+
+.result-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.result-price {
+  display: flex;
+  align-items: baseline;
+}
+
+.price-current {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #ff6b35;
+  margin-right: 10rpx;
+}
+
+.price-original {
+  font-size: 24rpx;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.add-cart-btn {
+  width: 50rpx;
+  height: 50rpx;
+  background-color: #ff6b35;
+  border-radius: 25rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #fff;
+}
+
+.add-cart-btn:active {
+  background-color: #e55a2b;
+}
+
+/* 空状态 */
+.empty-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 40rpx;
+  background-color: #fff;
+}
+
+.empty-icon {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 30rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: #999;
+  text-align: center;
+}
+
+/* 加载状态 */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80rpx;
+  background-color: #fff;
+  color: #999;
+  font-size: 28rpx;
+}
