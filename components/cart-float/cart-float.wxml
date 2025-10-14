@@ -1,0 +1,20 @@
+<!--components/cart-float/cart-float.wxml-->
+<view class="cart-float {{cartCount > 0 ? 'has-items' : ''}}" bindtap="onCartTap" wx:if="{{show}}">
+  <!-- 购物车图标 -->
+  <view class="cart-icon-wrapper">
+    <image class="cart-icon" src="/images/cart-white.png" mode="aspectFit"></image>
+    <!-- 商品数量徽章 -->
+    <view class="cart-badge" wx:if="{{cartCount > 0}}">
+      <text class="badge-text">{{cartCount > 99 ? '99+' : cartCount}}</text>
+    </view>
+  </view>
+  
+  <!-- 总价显示 -->
+  <view class="cart-price" wx:if="{{cartCount > 0}}">
+    <text class="price-symbol">¥</text>
+    <text class="price-value">{{totalPrice}}</text>
+  </view>
+  
+  <!-- 波纹动画 -->
+  <view class="cart-ripple" wx:if="{{showRipple}}"></view>
+</view>

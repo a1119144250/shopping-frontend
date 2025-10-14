@@ -1,0 +1,82 @@
+<!--pages/address-edit/address-edit.wxml-->
+<view class="container">
+  <form bindsubmit="onSubmit">
+    <!-- 联系人信息 -->
+    <view class="form-section">
+      <view class="form-item">
+        <text class="form-label">收货人</text>
+        <input class="form-input" 
+               name="name" 
+               value="{{formData.name}}" 
+               placeholder="请输入收货人姓名" 
+               bindinput="onInputChange" 
+               data-field="name" />
+      </view>
+      
+      <view class="form-item">
+        <text class="form-label">手机号</text>
+        <input class="form-input" 
+               name="phone" 
+               value="{{formData.phone}}" 
+               placeholder="请输入手机号" 
+               type="number" 
+               bindinput="onInputChange" 
+               data-field="phone" />
+      </view>
+    </view>
+
+    <!-- 地址信息 -->
+    <view class="form-section">
+      <view class="form-item" bindtap="onLocationTap">
+        <text class="form-label">所在地区</text>
+        <view class="location-selector">
+          <text class="location-text" wx:if="{{formData.region}}">{{formData.region}}</text>
+          <text class="location-placeholder" wx:else>请选择省市区</text>
+          <text class="location-arrow">></text>
+        </view>
+      </view>
+      
+      <view class="form-item">
+        <text class="form-label">详细地址</text>
+        <textarea class="form-textarea" 
+                  name="detail" 
+                  value="{{formData.detail}}" 
+                  placeholder="请输入详细地址（如街道、门牌号等）" 
+                  bindinput="onInputChange" 
+                  data-field="detail"
+                  maxlength="100">
+        </textarea>
+      </view>
+    </view>
+
+    <!-- 地址标签 -->
+    <view class="form-section">
+      <view class="form-label">地址标签</view>
+      <view class="tag-list">
+        <block wx:for="{{tagOptions}}" wx:key="index">
+          <view class="tag-item {{formData.tag === item ? 'active' : ''}}" 
+                bindtap="onTagSelect" 
+                data-tag="{{item}}">
+            {{item}}
+          </view>
+        </block>
+      </view>
+    </view>
+
+    <!-- 默认地址设置 -->
+    <view class="form-section">
+      <view class="form-item switch-item">
+        <text class="form-label">设为默认地址</text>
+        <switch name="isDefault" 
+                checked="{{formData.isDefault}}" 
+                bindchange="onSwitchChange" 
+                color="#ff6b35" />
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-section">
+      <button class="submit-btn" form-type="submit">保存地址</button>
+    </view>
+  </form>
+</view>

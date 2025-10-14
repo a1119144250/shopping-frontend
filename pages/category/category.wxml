@@ -1,0 +1,88 @@
+<!--pages/category/category.wxml-->
+<view class="container">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input" bindtap="onSearchTap">
+      <icon class="search-icon" type="search" size="16"></icon>
+      <text class="search-placeholder">搜索商品</text>
+    </view>
+  </view>
+
+  <view class="category-content">
+    <!-- 左侧分类列表 -->
+    <scroll-view class="category-sidebar" scroll-y="{{true}}">
+      <view class="sidebar-list">
+        <block wx:for="{{categories}}" wx:key="id">
+          <view class="sidebar-item {{currentCategoryId === item.id ? 'active' : ''}}" 
+                bindtap="onCategorySelect" 
+                data-id="{{item.id}}">
+            <text class="sidebar-text">{{item.name}}</text>
+            <view class="sidebar-badge" wx:if="{{item.count > 0}}">{{item.count}}</view>
+          </view>
+        </block>
+      </view>
+    </scroll-view>
+
+    <!-- 右侧商品列表 -->
+    <scroll-view class="product-content" scroll-y="{{true}}" bindscrolltolower="onReachBottom">
+      <!-- 分类标题 -->
+      <view class="category-header" wx:if="{{currentCategory}}">
+        <image class="category-icon" src="{{currentCategory.icon}}" mode="aspectFit"></image>
+        <view class="category-info">
+          <text class="category-name">{{currentCategory.name}}</text>
+          <text class="category-desc">{{currentCategory.description}}</text>
+        </view>
+      </view>
+
+      <!-- 商品列表 -->
+      <view class="product-list">
+        <block wx:for="{{products}}" wx:key="id">
+          <view class="product-item" bindtap="onProductClick" data-product="{{item}}">
+            <image class="product-image" src="{{item.image}}" mode="aspectFill"></image>
+            <view class="product-info">
+              <text class="product-name">{{item.name}}</text>
+              <text class="product-desc">{{item.description}}</text>
+              <view class="product-meta">
+                <text class="product-sales">月销 {{item.sales}}</text>
+                <view class="product-rating">
+                  <text class="rating-text">{{item.rating}}</text>
+                  <text class="rating-star">★</text>
+                </view>
+              </view>
+              <view class="product-bottom">
+                <view class="product-price">
+                  <text class="price-current">¥{{item.price}}</text>
+                  <text class="price-original" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+                </view>
+                <view class="product-actions">
+                  <view class="cart-controls" wx:if="{{item.cartCount > 0}}">
+                    <view class="cart-btn cart-minus" bindtap="onCartMinus" data-id="{{item.id}}">-</view>
+                    <text class="cart-count">{{item.cartCount}}</text>
+                    <view class="cart-btn cart-plus" bindtap="onCartPlus" data-id="{{item.id}}">+</view>
+                  </view>
+                  <view class="add-cart-btn" wx:else bindtap="onAddToCart" data-product="{{item}}">
+                    <text>+</text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </block>
+      </view>
+
+      <!-- 加载状态 -->
+      <view class="loading" wx:if="{{loading}}">
+        <text>加载中...</text>
+      </view>
+
+      <!-- 空状态 -->
+      <view class="empty" wx:if="{{!loading && products.length === 0}}">
+        <image class="empty-icon" src="/images/empty-product.png" mode="aspectFit"></image>
+        <text class="empty-text">暂无商品</text>
+      </view>
+    </scroll-view>
+  </view>
+</view>
+
+<!-- 购物车悬浮按钮 -->
+<cart-float bind:carttap="onCartTap"></cart-float>

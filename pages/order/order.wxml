@@ -1,0 +1,117 @@
+<!--pages/order/order.wxml-->
+<view class="container">
+  <!-- 收货地址 -->
+  <view class="address-section" bindtap="onAddressTap">
+    <view class="address-content" wx:if="{{selectedAddress}}">
+      <view class="address-info">
+        <view class="address-header">
+          <text class="address-name">{{selectedAddress.name}}</text>
+          <text class="address-phone">{{selectedAddress.phone}}</text>
+        </view>
+        <text class="address-detail">{{selectedAddress.detail}}</text>
+      </view>
+      <view class="address-arrow">></view>
+    </view>
+    <view class="address-empty" wx:else>
+      <text class="empty-text">请选择收货地址</text>
+      <view class="address-arrow">></view>
+    </view>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="goods-section">
+    <view class="section-title">
+      <text>商品清单</text>
+    </view>
+    <view class="goods-list">
+      <block wx:for="{{orderItems}}" wx:key="id">
+        <view class="goods-item">
+          <image class="goods-image" src="{{item.image}}" mode="aspectFill"></image>
+          <view class="goods-info">
+            <text class="goods-name">{{item.name}}</text>
+            <text class="goods-desc">{{item.description}}</text>
+            <view class="goods-bottom">
+              <text class="goods-price">¥{{item.price}}</text>
+              <text class="goods-count">x{{item.count}}</text>
+            </view>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 配送信息 -->
+  <view class="delivery-section">
+    <view class="section-title">
+      <text>配送信息</text>
+    </view>
+    <view class="delivery-item">
+      <text class="delivery-label">配送方式</text>
+      <text class="delivery-value">外卖配送</text>
+    </view>
+    <view class="delivery-item">
+      <text class="delivery-label">配送费</text>
+      <text class="delivery-value">¥{{deliveryFee}}</text>
+    </view>
+    <view class="delivery-item">
+      <text class="delivery-label">预计送达</text>
+      <text class="delivery-value">{{estimatedTime}}</text>
+    </view>
+  </view>
+
+  <!-- 优惠券 -->
+  <view class="coupon-section" bindtap="onCouponTap">
+    <view class="coupon-content">
+      <text class="coupon-label">优惠券</text>
+      <view class="coupon-info">
+        <text class="coupon-text" wx:if="{{selectedCoupon}}">-¥{{selectedCoupon.discount}}</text>
+        <text class="coupon-text" wx:else>选择优惠券</text>
+        <view class="coupon-arrow">></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 备注 -->
+  <view class="remark-section">
+    <view class="section-title">
+      <text>订单备注</text>
+    </view>
+    <textarea class="remark-input" 
+              placeholder="请输入备注信息（选填）" 
+              value="{{remark}}" 
+              bindinput="onRemarkInput"
+              maxlength="100">
+    </textarea>
+  </view>
+
+  <!-- 费用明细 -->
+  <view class="cost-section">
+    <view class="cost-item">
+      <text class="cost-label">商品金额</text>
+      <text class="cost-value">¥{{goodsAmount}}</text>
+    </view>
+    <view class="cost-item">
+      <text class="cost-label">配送费</text>
+      <text class="cost-value">¥{{deliveryFee}}</text>
+    </view>
+    <view class="cost-item" wx:if="{{selectedCoupon}}">
+      <text class="cost-label">优惠券</text>
+      <text class="cost-value discount">-¥{{selectedCoupon.discount}}</text>
+    </view>
+    <view class="cost-item total">
+      <text class="cost-label">实付金额</text>
+      <text class="cost-value">¥{{totalAmount}}</text>
+    </view>
+  </view>
+</view>
+
+<!-- 底部提交栏 -->
+<view class="submit-bar">
+  <view class="submit-info">
+    <text class="submit-label">实付：</text>
+    <text class="submit-price">¥{{totalAmount}}</text>
+  </view>
+  <button class="submit-btn" bindtap="onSubmitOrder" disabled="{{!selectedAddress}}">
+    提交订单
+  </button>
+</view>

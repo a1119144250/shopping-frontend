@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "cart-float": "/components/cart-float/cart-float"
+  },
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 50,
+  "navigationBarTitleText": "商品分类"
+}

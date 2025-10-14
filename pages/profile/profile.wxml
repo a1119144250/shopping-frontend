@@ -1,0 +1,118 @@
+<!--pages/profile/profile.wxml-->
+<view class="container">
+  <!-- 用户信息区域 -->
+  <view class="user-section">
+    <view class="user-info" bindtap="onUserInfoTap">
+      <image class="user-avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <view class="user-details">
+        <text class="user-name">{{userInfo.nickName || '点击登录'}}</text>
+        <text class="user-phone" wx:if="{{userInfo.phone}}">{{userInfo.phone}}</text>
+        <text class="user-login-tip" wx:else>登录享受更多服务</text>
+      </view>
+      <view class="user-arrow">
+        <text>></text>
+      </view>
+    </view>
+    
+    <!-- 会员信息 -->
+    <view class="member-info" wx:if="{{userInfo.nickName}}">
+      <view class="member-item">
+        <text class="member-label">积分</text>
+        <text class="member-value">{{userInfo.points || 0}}</text>
+      </view>
+      <view class="member-item">
+        <text class="member-label">优惠券</text>
+        <text class="member-value">{{userInfo.coupons || 0}}</text>
+      </view>
+      <view class="member-item">
+        <text class="member-label">余额</text>
+        <text class="member-value">¥{{userInfo.balance || 0}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 订单区域 -->
+  <view class="order-section">
+    <view class="section-header" bindtap="onAllOrdersTap">
+      <text class="section-title">我的订单</text>
+      <view class="section-more">
+        <text>查看全部</text>
+        <text>></text>
+      </view>
+    </view>
+    <view class="order-status-list">
+      <view class="status-item" bindtap="onOrderStatusTap" data-status="pending">
+        <image class="status-icon" src="/images/order/pending.png" mode="aspectFit"></image>
+        <text class="status-text">待付款</text>
+        <view class="status-badge" wx:if="{{orderCounts.pending > 0}}">{{orderCounts.pending}}</view>
+      </view>
+      <view class="status-item" bindtap="onOrderStatusTap" data-status="confirmed">
+        <image class="status-icon" src="/images/order/confirmed.png" mode="aspectFit"></image>
+        <text class="status-text">待接单</text>
+        <view class="status-badge" wx:if="{{orderCounts.confirmed > 0}}">{{orderCounts.confirmed}}</view>
+      </view>
+      <view class="status-item" bindtap="onOrderStatusTap" data-status="preparing">
+        <image class="status-icon" src="/images/order/preparing.png" mode="aspectFit"></image>
+        <text class="status-text">制作中</text>
+        <view class="status-badge" wx:if="{{orderCounts.preparing > 0}}">{{orderCounts.preparing}}</view>
+      </view>
+      <view class="status-item" bindtap="onOrderStatusTap" data-status="delivering">
+        <image class="status-icon" src="/images/order/delivering.png" mode="aspectFit"></image>
+        <text class="status-text">配送中</text>
+        <view class="status-badge" wx:if="{{orderCounts.delivering > 0}}">{{orderCounts.delivering}}</view>
+      </view>
+      <view class="status-item" bindtap="onOrderStatusTap" data-status="completed">
+        <image class="status-icon" src="/images/order/completed.png" mode="aspectFit"></image>
+        <text class="status-text">已完成</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-section">
+    <view class="menu-group">
+      <view class="menu-item" bindtap="onMenuTap" data-type="address">
+        <image class="menu-icon" src="/images/menu/address.png" mode="aspectFit"></image>
+        <text class="menu-text">收货地址</text>
+        <view class="menu-arrow">></view>
+      </view>
+      <view class="menu-item" bindtap="onMenuTap" data-type="coupon">
+        <image class="menu-icon" src="/images/menu/coupon.png" mode="aspectFit"></image>
+        <text class="menu-text">优惠券</text>
+        <view class="menu-badge" wx:if="{{userInfo.coupons > 0}}">{{userInfo.coupons}}</view>
+        <view class="menu-arrow">></view>
+      </view>
+      <view class="menu-item" bindtap="onMenuTap" data-type="favorite">
+        <image class="menu-icon" src="/images/menu/favorite.png" mode="aspectFit"></image>
+        <text class="menu-text">我的收藏</text>
+        <view class="menu-arrow">></view>
+      </view>
+    </view>
+
+    <view class="menu-group">
+      <view class="menu-item" bindtap="onMenuTap" data-type="feedback">
+        <image class="menu-icon" src="/images/menu/feedback.png" mode="aspectFit"></image>
+        <text class="menu-text">意见反馈</text>
+        <view class="menu-arrow">></view>
+      </view>
+      <view class="menu-item" bindtap="onMenuTap" data-type="about">
+        <image class="menu-icon" src="/images/menu/about.png" mode="aspectFit"></image>
+        <text class="menu-text">关于我们</text>
+        <view class="menu-arrow">></view>
+      </view>
+      <view class="menu-item" bindtap="onMenuTap" data-type="settings">
+        <image class="menu-icon" src="/images/menu/settings.png" mode="aspectFit"></image>
+        <text class="menu-text">设置</text>
+        <view class="menu-arrow">></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 客服联系 -->
+  <view class="contact-section">
+    <button class="contact-btn" open-type="contact">
+      <image class="contact-icon" src="/images/menu/service.png" mode="aspectFit"></image>
+      <text>联系客服</text>
+    </button>
+  </view>
+</view>

@@ -1,0 +1,41 @@
+<!--components/product-card/product-card.wxml-->
+<view class="product-card" bindtap="onProductClick">
+  <!-- 商品图片 -->
+  <view class="product-image-wrapper">
+    <image class="product-image" src="{{product.image}}" mode="aspectFill" lazy-load="{{true}}"></image>
+    <!-- 折扣标签 -->
+    <view class="discount-tag" wx:if="{{product.originalPrice && product.originalPrice > product.price}}">
+      <text>{{discountText}}</text>
+    </view>
+  </view>
+
+  <!-- 商品信息 -->
+  <view class="product-info">
+    <text class="product-name">{{product.name}}</text>
+    <text class="product-desc">{{product.description}}</text>
+    
+    <!-- 评分和销量 -->
+    <view class="product-meta">
+      <view class="product-rating" wx:if="{{product.rating}}">
+        <text class="rating-text">{{product.rating}}</text>
+        <text class="rating-star">★</text>
+      </view>
+      <text class="product-sales" wx:if="{{product.sales}}">月销 {{product.sales}}</text>
+    </view>
+
+    <!-- 价格和操作 -->
+    <view class="product-bottom">
+      <view class="product-price">
+        <text class="price-current">¥{{product.price}}</text>
+        <text class="price-original" wx:if="{{product.originalPrice}}">¥{{product.originalPrice}}</text>
+      </view>
+      
+      <!-- 加入购物车按钮 -->
+      <view class="add-cart-wrapper">
+        <view class="add-cart-btn" bindtap="onAddToCart" data-product="{{product}}">
+          <text class="add-icon">+</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
