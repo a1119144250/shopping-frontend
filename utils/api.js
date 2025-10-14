@@ -5,7 +5,7 @@ const app = getApp()
 
 // API基础配置
 const API_CONFIG = {
-  baseUrl: 'https://api.example.com', // 替换为实际的API地址
+  baseUrl: 'http://localhost:8082', // 后端API地址
   timeout: 10000,
   header: {
     'Content-Type': 'application/json'
@@ -17,6 +17,9 @@ const API_CONFIG = {
  * @param {Object} options 请求配置
  */
 function request(options) {
+  console.log('🔵 request 函数被调用')
+  console.log('请求配置:', options)
+  
   return new Promise((resolve, reject) => {
     // 显示加载提示
     if (options.showLoading !== false) {
@@ -42,6 +45,12 @@ function request(options) {
       header.Authorization = `Bearer ${token}`
     }
 
+    console.log('🚀 准备发送 wx.request')
+    console.log('URL:', url)
+    console.log('Method:', options.method || 'GET')
+    console.log('Data:', options.data)
+    console.log('Header:', header)
+
     wx.request({
       url,
       method: options.method || 'GET',
@@ -49,6 +58,10 @@ function request(options) {
       header,
       timeout: options.timeout || API_CONFIG.timeout,
       success: (res) => {
+        console.log('✅ wx.request success 回调')
+        console.log('响应状态码:', res.statusCode)
+        console.log('响应数据:', res.data)
+        
         wx.hideLoading()
         
         // 统一处理响应
@@ -88,6 +101,9 @@ function request(options) {
         }
       },
       fail: (error) => {
+        console.error('❌ wx.request fail 回调')
+        console.error('错误信息:', error)
+        
         wx.hideLoading()
         console.error('API请求失败:', error)
         
@@ -108,6 +124,8 @@ function request(options) {
         reject(error)
       }
     })
+    
+    console.log('⏳ wx.request 已调用，等待回调...')
   })
 }
 
