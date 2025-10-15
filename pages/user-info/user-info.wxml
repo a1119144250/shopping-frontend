@@ -119,15 +119,21 @@
 
   <!-- 操作按钮 -->
   <view class="action-section">
-    <button class="edit-btn" bindtap="handleEdit">
-      <image class="btn-icon" src="/images/icons/edit.png" mode="aspectFit"></image>
-      <text>编辑资料</text>
-    </button>
-    
-    <button class="logout-btn" bindtap="handleLogout">
-      <image class="btn-icon" src="/images/icons/logout.png" mode="aspectFit"></image>
-      <text>退出登录</text>
-    </button>
+    <view class="button-row">
+      <button class="edit-btn" bindtap="handleEdit">
+        <view class="btn-content">
+          <image class="btn-icon" src="/images/icons/edit.png" mode="aspectFit"></image>
+          <text>编辑资料</text>
+        </view>
+      </button>
+      
+      <button class="logout-btn" bindtap="handleLogout">
+        <view class="btn-content">
+          <image class="btn-icon" src="/images/icons/logout.png" mode="aspectFit"></image>
+          <text>退出登录</text>
+        </view>
+      </button>
+    </view>
   </view>
 </view>
 

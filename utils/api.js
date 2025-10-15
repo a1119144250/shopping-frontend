@@ -179,12 +179,25 @@ function del(url, data = {}, options = {}) {
 // 文件上传
 function uploadFile(filePath, options = {}) {
   return new Promise((resolve, reject) => {
+    // 显示上传进度
+    if (options.showLoading !== false) {
+      wx.showLoading({
+        title: '上传中...',
+        mask: true
+      })
+    }
+
     const token = wx.getStorageSync('token')
     const header = { ...options.header }
     
     if (token) {
-      header.Authorization = `Bearer ${token}`
+      header.satoken = token  // 使用 satoken 保持一致
     }
+
+    console.log('🚀 准备上传文件')
+    console.log('文件路径:', filePath)
+    console.log('上传 URL:', `${API_CONFIG.baseUrl}${options.url || '/upload'}`)
+    console.log('Header:', header)
 
     wx.uploadFile({
       url: `${API_CONFIG.baseUrl}${options.url || '/upload'}`,
@@ -193,18 +206,48 @@ function uploadFile(filePath, options = {}) {
       formData: options.formData || {},
       header,
       success: (res) => {
+        console.log('✅ 文件上传成功')
+        console.log('响应状态码:', res.statusCode)
+        console.log('响应数据:', res.data)
+        
+        wx.hideLoading()
+        
         try {
           const data = JSON.parse(res.data)
           if (data.code === 0 || data.success) {
             resolve(data.data || data)
           } else {
-            reject(new Error(data.message || '上传失败'))
+            const message = data.message || data.msg || '上传失败'
+            wx.showToast({
+              title: message,
+              icon: 'none'
+            })
+            reject(new Error(message))
           }
         } catch (error) {
+          console.error('解析响应数据失败:', error)
           reject(new Error('响应格式错误'))
         }
       },
-      fail: reject
+      fail: (error) => {
+        console.error('❌ 文件上传失败:', error)
+        wx.hideLoading()
+        
+        let message = '上传失败'
+        if (error.errMsg) {
+          if (error.errMsg.includes('timeout')) {
+            message = '上传超时，请重试'
+          } else if (error.errMsg.includes('fail')) {
+            message = '上传失败，请检查网络'
+          }
+        }
+        
+        wx.showToast({
+          title: message,
+          icon: 'none'
+        })
+        reject(error)
+      }
     })
   })
 }
@@ -227,6 +270,11 @@ const API = {
     profile: () => get('/user/profile'),
     // 更新用户信息
     updateProfile: (data) => put('/user/profile', data),
+    // 上传头像
+    uploadAvatar: (filePath) => uploadFile(filePath, {
+      url: '/user/avatar',
+      name: 'avatar'
+    }),
     // 退出登录
     logout: () => post('/user/logout')
   },

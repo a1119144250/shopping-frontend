@@ -8,7 +8,8 @@ Page({
       nickName: '',
       phone: '',
       email: '',
-      gender: 0
+      gender: 0,
+      avatarUrl: ''
     },
     genderOptions: ['未知', '男', '女'],
     isSubmitting: false
@@ -32,7 +33,8 @@ Page({
         nickName: userInfo.nickName || '',
         phone: userInfo.phone || '',
         email: userInfo.email || '',
-        gender: userInfo.gender || 0
+        gender: userInfo.gender || 0,
+        avatarUrl: userInfo.avatarUrl || ''
       }
     })
   },
@@ -67,59 +69,62 @@ Page({
   handleChooseAvatar() {
     wx.chooseImage({
       count: 1,
-      sizeType: ['compressed'],
+      sizeType: ['compressed'],  // 压缩图片
       sourceType: ['album', 'camera'],
       success: (res) => {
         const tempFilePath = res.tempFilePaths[0]
         console.log('选择的图片:', tempFilePath)
         
-        // 显示预览
+        // 先显示预览
         this.setData({
           'formData.avatarUrl': tempFilePath
         })
         
-        // TODO: 上传图片到服务器
-        // this.uploadAvatar(tempFilePath)
-        
+        // 上传图片到服务器
+        this.uploadAvatar(tempFilePath)
+      },
+      fail: (error) => {
+        console.error('选择图片失败:', error)
         wx.showToast({
-          title: '头像上传功能开发中',
+          title: '选择图片失败',
           icon: 'none'
         })
       }
     })
   },
 
-  // 上传头像（预留）
+  // 上传头像
   async uploadAvatar(filePath) {
     try {
-      wx.showLoading({
-        title: '上传中...',
-        mask: true
-      })
-
+      console.log('开始上传头像...')
+      
       const { API } = require('../../utils/api.js')
-      const result = await API.common.upload(filePath, {
-        url: '/upload/avatar',
-        name: 'avatar'
-      })
+      const result = await API.user.uploadAvatar(filePath)
 
       console.log('头像上传成功:', result)
       
+      // 更新表单数据中的头像URL（使用服务器返回的URL）
       this.setData({
-        'formData.avatarUrl': result.url
+        'formData.avatarUrl': result.avatarUrl || result.url || result
       })
 
-      wx.hideLoading()
       wx.showToast({
         title: '头像上传成功',
-        icon: 'success'
+        icon: 'success',
+        duration: 2000
       })
     } catch (error) {
       console.error('头像上传失败:', error)
-      wx.hideLoading()
+      
+      // 清除预览的临时图片
+      this.setData({
+        'formData.avatarUrl': this.data.userInfo.avatarUrl || ''
+      })
+      
       wx.showToast({
-        title: '上传失败',
-        icon: 'none'
+        title: error.message || '上传失败，请重试',
+        icon: 'none',
+        duration: 2000
       })
     }
   },
@@ -174,7 +179,8 @@ Page({
       formData.nickName !== (userInfo.nickName || '') ||
       formData.phone !== (userInfo.phone || '') ||
       formData.email !== (userInfo.email || '') ||
-      formData.gender !== (userInfo.gender || 0)
+      formData.gender !== (userInfo.gender || 0) ||
+      formData.avatarUrl !== (userInfo.avatarUrl || '')
 
     if (!hasChanges) {
       wx.showToast({
@@ -202,6 +208,7 @@ Page({
       if (formData.nickName) updateData.nickName = formData.nickName.trim()
       if (formData.phone) updateData.phone = formData.phone
       if (formData.email) updateData.email = formData.email
+      if (formData.avatarUrl) updateData.avatarUrl = formData.avatarUrl
       updateData.gender = formData.gender
 
       console.log('提交更新数据:', updateData)

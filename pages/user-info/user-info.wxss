@@ -128,11 +128,16 @@
   padding: 0;
 }
 
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 24rpx;
+}
+
 .edit-btn,
 .logout-btn {
-  width: 100%;
+  flex: 1;
   height: 88rpx;
-  margin-bottom: 24rpx;
   border-radius: 16rpx;
   display: flex;
   align-items: center;
@@ -140,6 +145,21 @@
   font-size: 32rpx;
   font-weight: 500;
   border: none;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+}
+
+.btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -30rpx;
+}
+
+.edit-btn text,
+.logout-btn text {
+  line-height: 1;
 }
 
 .edit-btn {
@@ -157,7 +177,7 @@
 .btn-icon {
   width: 36rpx;
   height: 36rpx;
-  margin-right: 12rpx;
+  margin-right: 8rpx;
 }
 
 /* 按钮点击效果 */
