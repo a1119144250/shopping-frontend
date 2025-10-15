@@ -1,0 +1,177 @@
+<!--pages/register/register.wxml-->
+<view class="container">
+  <view class="register-box">
+    <!-- Logo区域 -->
+    <view class="logo-section">
+      <view class="logo-placeholder">🍔</view>
+      <text class="app-name">美食外卖</text>
+      <text class="welcome-text">欢迎注册</text>
+    </view>
+
+    <!-- 注册方式切换 -->
+    <view class="type-tabs">
+      <view 
+        class="type-tab {{registerType === 'account' ? 'active' : ''}}" 
+        data-type="account"
+        bindtap="switchRegisterType"
+      >
+        <text>账号注册</text>
+      </view>
+      <view 
+        class="type-tab {{registerType === 'phone' ? 'active' : ''}}" 
+        data-type="phone"
+        bindtap="switchRegisterType"
+      >
+        <text>手机号注册</text>
+      </view>
+    </view>
+
+    <!-- 账号注册表单 -->
+    <view class="form-section" wx:if="{{registerType === 'account'}}">
+      <!-- 用户名输入 -->
+      <view class="input-group">
+        <view class="input-label">
+          <text class="input-icon-text">👤</text>
+        </view>
+        <input 
+          class="input-field" 
+          type="text" 
+          placeholder="请输入用户名（3-20位）"
+          value="{{username}}"
+          bindinput="onUsernameInput"
+          maxlength="20"
+        />
+      </view>
+
+      <!-- 密码输入 -->
+      <view class="input-group">
+        <view class="input-label">
+          <text class="input-icon-text">🔒</text>
+        </view>
+        <input 
+          class="input-field" 
+          password="{{!showPassword}}"
+          placeholder="请输入密码（至少6位）"
+          value="{{password}}"
+          bindinput="onPasswordInput"
+          maxlength="20"
+        />
+        <view class="input-action" bindtap="togglePasswordVisibility">
+          <text class="eye-icon">{{showPassword ? '👁️' : '👁️‍🗨️'}}</text>
+        </view>
+      </view>
+
+      <!-- 确认密码输入 -->
+      <view class="input-group">
+        <view class="input-label">
+          <text class="input-icon-text">🔒</text>
+        </view>
+        <input 
+          class="input-field" 
+          password="{{!showConfirmPassword}}"
+          placeholder="请再次输入密码"
+          value="{{confirmPassword}}"
+          bindinput="onConfirmPasswordInput"
+          maxlength="20"
+        />
+        <view class="input-action" bindtap="toggleConfirmPasswordVisibility">
+          <text class="eye-icon">{{showConfirmPassword ? '👁️' : '👁️‍🗨️'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 手机号注册表单 -->
+    <view class="form-section" wx:if="{{registerType === 'phone'}}">
+      <!-- 手机号输入 -->
+      <view class="input-group">
+        <view class="input-label">
+          <text class="input-icon-text">📱</text>
+        </view>
+        <input 
+          class="input-field" 
+          type="number" 
+          placeholder="请输入手机号"
+          value="{{phone}}"
+          bindinput="onPhoneInput"
+          maxlength="11"
+        />
+      </view>
+
+      <!-- 验证码输入 -->
+      <view class="input-group">
+        <view class="input-label">
+          <text class="input-icon-text">🔢</text>
+        </view>
+        <input 
+          class="input-field" 
+          type="number" 
+          placeholder="请输入验证码"
+          value="{{verifyCode}}"
+          bindinput="onVerifyCodeInput"
+          maxlength="6"
+        />
+        <view class="input-action">
+          <button 
+            class="send-code-btn {{canSendCode ? '' : 'disabled'}}" 
+            bindtap="sendVerifyCode"
+            disabled="{{!canSendCode}}"
+          >
+            {{canSendCode ? '发送验证码' : countdown + 's'}}
+          </button>
+        </view>
+      </view>
+
+      <!-- 密码输入 -->
+      <view class="input-group">
+        <view class="input-label">
+          <text class="input-icon-text">🔒</text>
+        </view>
+        <input 
+          class="input-field" 
+          password="{{!showPassword}}"
+          placeholder="请输入密码（至少6位）"
+          value="{{password}}"
+          bindinput="onPasswordInput"
+          maxlength="20"
+        />
+        <view class="input-action" bindtap="togglePasswordVisibility">
+          <text class="eye-icon">{{showPassword ? '👁️' : '👁️‍🗨️'}}</text>
+        </view>
+      </view>
+
+      <!-- 确认密码输入 -->
+      <view class="input-group">
+        <view class="input-label">
+          <text class="input-icon-text">🔒</text>
+        </view>
+        <input 
+          class="input-field" 
+          password="{{!showConfirmPassword}}"
+          placeholder="请再次输入密码"
+          value="{{confirmPassword}}"
+          bindinput="onConfirmPasswordInput"
+          maxlength="20"
+        />
+        <view class="input-action" bindtap="toggleConfirmPasswordVisibility">
+          <text class="eye-icon">{{showConfirmPassword ? '👁️' : '👁️‍🗨️'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 注册按钮 -->
+    <button 
+      class="register-btn {{isLoading ? 'disabled' : ''}}" 
+      bindtap="handleRegister"
+      disabled="{{isLoading}}"
+    >
+      {{isLoading ? '注册中...' : '注册'}}
+    </button>
+
+    <!-- 登录入口 -->
+    <view class="login-section">
+      <text class="login-hint">已有账号？</text>
+      <text class="login-link" bindtap="goToLogin">立即登录</text>
+    </view>
+  </view>
+</view>
+

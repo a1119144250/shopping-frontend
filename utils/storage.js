@@ -118,6 +118,7 @@ function removeStorageAsync(key) {
 const STORAGE_KEYS = {
   USER_INFO: 'userInfo',
   TOKEN: 'token',
+  TOKEN_EXPIRE_TIME: 'tokenExpireTime',
   CART: 'cart',
   SEARCH_HISTORY: 'searchHistory',
   BROWSE_HISTORY: 'browseHistory',
@@ -144,11 +145,18 @@ const userStorage = {
   clearUserInfo() {
     removeStorage(STORAGE_KEYS.USER_INFO)
     removeStorage(STORAGE_KEYS.TOKEN)
+    removeStorage(STORAGE_KEYS.TOKEN_EXPIRE_TIME)
   },
 
   // 设置token
-  setToken(token) {
-    return setStorage(STORAGE_KEYS.TOKEN, token)
+  setToken(token, expireDays = 7) {
+    const success = setStorage(STORAGE_KEYS.TOKEN, token)
+    if (success) {
+      // 设置过期时间（默认7天）
+      const expireTime = Date.now() + expireDays * 24 * 60 * 60 * 1000
+      setStorage(STORAGE_KEYS.TOKEN_EXPIRE_TIME, expireTime)
+    }
+    return success
   },
 
   // 获取token
@@ -156,11 +164,80 @@ const userStorage = {
     return getStorage(STORAGE_KEYS.TOKEN, '')
   },
 
-  // 检查是否已登录
+  // 获取token过期时间
+  getTokenExpireTime() {
+    return getStorage(STORAGE_KEYS.TOKEN_EXPIRE_TIME, 0)
+  },
+
+  // 检查token是否有效
+  isTokenValid() {
+    const token = this.getToken()
+    const expireTime = this.getTokenExpireTime()
+    
+    if (!token) {
+      console.log('token 不存在')
+      return false
+    }
+
+    if (!expireTime) {
+      console.log('token 过期时间不存在')
+      return false
+    }
+
+    const now = Date.now()
+    if (now >= expireTime) {
+      console.log('token 已过期')
+      return false
+    }
+
+    // 计算剩余有效时间（小时）
+    const remainingHours = Math.floor((expireTime - now) / (60 * 60 * 1000))
+    console.log(`token 有效，剩余 ${remainingHours} 小时`)
+    return true
+  },
+
+  // 检查是否已登录（包含token有效性检查）
   isLoggedIn() {
     const token = this.getToken()
     const userInfo = this.getUserInfo()
-    return !!(token && userInfo.nickName)
+    const isValid = this.isTokenValid()
+    
+    if (!token || !userInfo.nickName) {
+      return false
+    }
+
+    // 如果token已过期，清除登录数据
+    if (!isValid) {
+      console.log('token 已过期，清除登录数据')
+      this.clearUserInfo()
+      return false
+    }
+
+    return true
+  },
+
+  // 设置完整的登录信息（token + userInfo）
+  setLoginInfo(token, userInfo, expireDays = 7) {
+    this.setToken(token, expireDays)
+    this.setUserInfo(userInfo)
+    return true
+  },
+
+  // 获取token剩余有效时间（毫秒）
+  getTokenRemainingTime() {
+    const expireTime = this.getTokenExpireTime()
+    if (!expireTime) {
+      return 0
+    }
+    const remaining = expireTime - Date.now()
+    return remaining > 0 ? remaining : 0
+  },
+
+  // 检查token是否即将过期（默认24小时内）
+  isTokenExpiringSoon(hours = 24) {
+    const remainingTime = this.getTokenRemainingTime()
+    const thresholdTime = hours * 60 * 60 * 1000
+    return remainingTime > 0 && remainingTime < thresholdTime
   }
 }
 

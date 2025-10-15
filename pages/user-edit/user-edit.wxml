@@ -1,0 +1,109 @@
+<!--pages/user-edit/user-edit.wxml-->
+<view class="container">
+  <!-- 头像编辑 -->
+  <view class="avatar-section">
+    <view class="avatar-label">头像</view>
+    <view class="avatar-wrapper" bindtap="handleChooseAvatar">
+      <image class="avatar-image" src="{{formData.avatarUrl || userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <view class="avatar-mask">
+        <image class="camera-icon" src="/images/icons/camera.png" mode="aspectFit"></image>
+        <text class="avatar-tip">点击更换</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 表单区域 -->
+  <view class="form-section">
+    <!-- 昵称 -->
+    <view class="form-item">
+      <view class="form-label">
+        <text class="label-text">昵称</text>
+      </view>
+      <input 
+        class="form-input" 
+        type="text" 
+        value="{{formData.nickName}}"
+        placeholder="请输入昵称（2-20个字符）"
+        maxlength="20"
+        bindinput="onNickNameInput"
+      />
+    </view>
+
+    <!-- 性别 -->
+    <view class="form-item">
+      <view class="form-label">
+        <text class="label-text">性别</text>
+      </view>
+      <picker 
+        class="form-picker" 
+        mode="selector" 
+        range="{{genderOptions}}" 
+        value="{{formData.gender}}"
+        bindchange="onGenderChange"
+      >
+        <view class="picker-value">{{genderOptions[formData.gender]}}</view>
+      </picker>
+    </view>
+
+    <!-- 手机号 -->
+    <view class="form-item">
+      <view class="form-label">
+        <text class="label-text">手机号</text>
+      </view>
+      <input 
+        class="form-input" 
+        type="number" 
+        value="{{formData.phone}}"
+        placeholder="请输入手机号"
+        maxlength="11"
+        bindinput="onPhoneInput"
+      />
+    </view>
+
+    <!-- 邮箱 -->
+    <view class="form-item">
+      <view class="form-label">
+        <text class="label-text">邮箱</text>
+      </view>
+      <input 
+        class="form-input" 
+        type="text" 
+        value="{{formData.email}}"
+        placeholder="请输入邮箱地址"
+        bindinput="onEmailInput"
+      />
+    </view>
+  </view>
+
+  <!-- 提示信息 -->
+  <view class="tips-section">
+    <view class="tips-item">
+      <text class="tips-icon">💡</text>
+      <text class="tips-text">修改手机号和邮箱需要确保未被其他用户使用</text>
+    </view>
+    <view class="tips-item">
+      <text class="tips-icon">🔒</text>
+      <text class="tips-text">您的个人信息将被安全保护</text>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-section">
+    <button 
+      class="submit-btn" 
+      bindtap="handleSubmit"
+      loading="{{isSubmitting}}"
+      disabled="{{isSubmitting}}"
+    >
+      {{isSubmitting ? '保存中...' : '保存'}}
+    </button>
+    <button 
+      class="cancel-btn" 
+      bindtap="handleCancel"
+      disabled="{{isSubmitting}}"
+    >
+      取消
+    </button>
+  </view>
+</view>
+

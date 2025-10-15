@@ -10,7 +10,8 @@ Page({
       preparing: 0,
       delivering: 0,
       completed: 0
-    }
+    },
+    isLoggingIn: false // 登录中状态标识
   },
 
   onLoad() {
@@ -64,12 +65,35 @@ Page({
 
   // 获取用户信息授权并登录
   getUserProfile() {
+    // 防止重复登录
+    if (this.data.isLoggingIn || app.globalData.isLoggingIn) {
+      console.log('正在登录中，请勿重复操作')
+      wx.showToast({
+        title: '正在登录中...',
+        icon: 'loading'
+      })
+      return Promise.reject(new Error('正在登录中'))
+    }
+
+    // 检查是否已登录
+    if (app.checkLoginStatus()) {
+      console.log('已有有效登录状态，无需重复登录')
+      const userInfo = wx.getStorageSync('userInfo')
+      this.setData({ userInfo })
+      return Promise.resolve(userInfo)
+    }
+
     return new Promise((resolve, reject) => {
       console.log('调用 wx.getUserProfile...')
       wx.getUserProfile({
         desc: '用于完善用户资料',
         success: async (res) => {
           console.log('wx.getUserProfile 成功:', res.userInfo)
+          
+          // 设置登录中状态
+          this.setData({ isLoggingIn: true })
+          app.globalData.isLoggingIn = true
+
           try {
             // 先获取微信登录code
             console.log('开始获取微信登录code...')
@@ -92,16 +116,22 @@ Page({
             console.log('返回的token:', result.token)
             console.log('返回的用户信息:', result.userInfo)
             
-            // 保存token和用户信息到本地
-            wx.setStorageSync('token', result.token)
-            wx.setStorageSync('userInfo', result.userInfo)
+            // 保存token和用户信息到本地，并设置过期时间（7天）
+            const { userStorage } = require('../../utils/storage.js')
+            userStorage.setLoginInfo(result.token, result.userInfo, 7)
             app.globalData.userInfo = result.userInfo
             
-            this.setData({ userInfo: result.userInfo })
+            this.setData({ 
+              userInfo: result.userInfo,
+              isLoggingIn: false 
+            })
             resolve(result.userInfo)
           } catch (error) {
             console.error('❌ 登录过程出错:', error)
+            this.setData({ isLoggingIn: false })
             reject(error)
+          } finally {
+            app.globalData.isLoggingIn = false
           }
         },
         fail: (error) => {
@@ -127,27 +157,80 @@ Page({
     console.log('=== 点击了用户头像区域 ===')
     console.log('当前用户信息:', this.data.userInfo)
     
-    if (!this.data.userInfo.nickName) {
-      try {
-        console.log('开始获取用户授权...')
-        await this.getUserProfile()
-        wx.showToast({
-          title: '登录成功',
-          icon: 'success'
-        })
-      } catch (error) {
-        console.error('获取用户信息失败:', error)
-        wx.showToast({
-          title: '登录失败',
-          icon: 'none'
-        })
-      }
+    // 检查登录状态
+    const { userStorage } = require('../../utils/storage.js')
+    const isLoggedIn = userStorage.isLoggedIn()
+    
+    if (!isLoggedIn || !this.data.userInfo.nickName) {
+      // 未登录，显示确认对话框
+      wx.showModal({
+        title: '登录确认',
+        content: '您还未登录，是否现在登录以享受更多服务？',
+        confirmText: '立即登录',
+        cancelText: '暂不登录',
+        success: (res) => {
+          if (res.confirm) {
+            // 跳转到登录页面
+            wx.navigateTo({
+              url: '/pages/login/login'
+            })
+          }
+        }
+      })
     } else {
-      // 已登录，跳转到个人信息编辑页面
+      // 已登录，跳转到用户信息详情页
       wx.navigateTo({
         url: '/pages/user-info/user-info'
       })
     }
+  },
+
+  // 退出登录
+  async handleLogout() {
+    wx.showModal({
+      title: '提示',
+      content: '确定要退出登录吗？',
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            // 调用后端退出登录接口
+            const { API } = require('../../utils/api.js')
+            console.log('调用后端退出登录接口...')
+            await API.user.logout()
+            console.log('✅ 后端退出登录成功')
+          } catch (error) {
+            // 即使后端调用失败，也继续清除本地数据
+            console.error('后端退出登录失败:', error)
+            console.log('继续清除本地数据...')
+          }
+          
+          // 清除本地存储
+          const { userStorage } = require('../../utils/storage.js')
+          userStorage.clearUserInfo()
+          
+          // 清除全局数据
+          app.globalData.userInfo = null
+          app.globalData.isLoggingIn = false
+          
+          // 刷新页面
+          this.setData({
+            userInfo: {},
+            orderCounts: {
+              pending: 0,
+              confirmed: 0,
+              preparing: 0,
+              delivering: 0,
+              completed: 0
+            }
+          })
+          
+          wx.showToast({
+            title: '已退出登录',
+            icon: 'success'
+          })
+        }
+      }
+    })
   },
 
 

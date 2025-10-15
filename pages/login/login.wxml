@@ -1,0 +1,84 @@
+<!--pages/login/login.wxml-->
+<view class="container">
+  <view class="login-box">
+    <!-- Logo区域 -->
+    <view class="logo-section">
+      <view class="logo-placeholder">🍔</view>
+      <text class="app-name">美食外卖</text>
+      <text class="welcome-text">欢迎登录</text>
+    </view>
+
+    <!-- 登录表单 -->
+    <view class="form-section">
+      <!-- 用户名输入 -->
+      <view class="input-group">
+        <view class="input-label">
+          <text class="input-icon-text">👤</text>
+        </view>
+        <input 
+          class="input-field" 
+          type="text" 
+          placeholder="请输入用户名"
+          value="{{username}}"
+          bindinput="onUsernameInput"
+          maxlength="20"
+        />
+      </view>
+
+      <!-- 密码输入 -->
+      <view class="input-group">
+        <view class="input-label">
+          <text class="input-icon-text">🔒</text>
+        </view>
+        <input 
+          class="input-field" 
+          password="{{!showPassword}}"
+          placeholder="请输入密码（至少6位）"
+          value="{{password}}"
+          bindinput="onPasswordInput"
+          maxlength="20"
+        />
+        <view class="input-action" bindtap="togglePasswordVisibility">
+          <text class="eye-icon">{{showPassword ? '👁️' : '👁️‍🗨️'}}</text>
+        </view>
+      </view>
+
+      <!-- 忘记密码 -->
+      <view class="forgot-password">
+        <text bindtap="handleForgotPassword">忘记密码？</text>
+      </view>
+
+      <!-- 登录按钮 -->
+      <button 
+        class="login-btn {{isLoading ? 'disabled' : ''}}" 
+        bindtap="handleLogin"
+        disabled="{{isLoading}}"
+      >
+        {{isLoading ? '登录中...' : '登录'}}
+      </button>
+
+      <!-- 注册入口 -->
+      <view class="register-section">
+        <text class="register-hint">还没有账号？</text>
+        <text class="register-link" bindtap="goToRegister">立即注册</text>
+      </view>
+    </view>
+
+    <!-- 其他登录方式 -->
+    <view class="other-login">
+      <view class="divider">
+        <view class="line"></view>
+        <text class="divider-text">其他登录方式</text>
+        <view class="line"></view>
+      </view>
+      
+      <view class="other-login-methods">
+        <view class="login-method">
+          <view class="method-icon-text">📱</view>
+          <text class="method-text">手机号登录</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+

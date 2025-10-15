@@ -1,0 +1,179 @@
+/* pages/register/register.wxss */
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 40rpx;
+  box-sizing: border-box;
+}
+
+.register-box {
+  background: #ffffff;
+  border-radius: 20rpx;
+  padding: 60rpx 40rpx;
+  box-shadow: 0 4rpx 20rpx rgba(255, 107, 53, 0.1);
+}
+
+/* Logo区域 */
+.logo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40rpx;
+}
+
+.logo {
+  width: 120rpx;
+  height: 120rpx;
+  margin-bottom: 20rpx;
+}
+
+.logo-placeholder {
+  width: 120rpx;
+  height: 120rpx;
+  font-size: 100rpx;
+  line-height: 120rpx;
+  text-align: center;
+  margin-bottom: 20rpx;
+}
+
+.app-name {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 10rpx;
+}
+
+.welcome-text {
+  font-size: 28rpx;
+  color: #999999;
+}
+
+/* 注册方式切换 */
+.type-tabs {
+  display: flex;
+  margin-bottom: 40rpx;
+  background: #f5f5f5;
+  border-radius: 10rpx;
+  padding: 8rpx;
+}
+
+.type-tab {
+  flex: 1;
+  height: 70rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  color: #999999;
+  transition: all 0.3s;
+}
+
+.type-tab.active {
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
+  color: #ffffff;
+  font-weight: bold;
+}
+
+/* 表单区域 */
+.form-section {
+  margin-bottom: 40rpx;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  background: #f5f5f5;
+  border-radius: 10rpx;
+  padding: 0 20rpx;
+  margin-bottom: 30rpx;
+  height: 90rpx;
+}
+
+.input-label {
+  width: 50rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-icon {
+  width: 36rpx;
+  height: 36rpx;
+}
+
+.input-icon-text {
+  font-size: 40rpx;
+  line-height: 1;
+}
+
+.input-field {
+  flex: 1;
+  height: 90rpx;
+  font-size: 28rpx;
+  padding-left: 20rpx;
+}
+
+.input-action {
+  width: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eye-icon {
+  font-size: 40rpx;
+  padding: 0 10rpx;
+}
+
+.send-code-btn {
+  font-size: 24rpx;
+  color: #ff6b35;
+  background: transparent;
+  border: none;
+  padding: 0;
+  line-height: 1;
+  width: 150rpx;
+  text-align: right;
+}
+
+.send-code-btn.disabled {
+  color: #999999;
+}
+
+.register-btn {
+  width: 100%;
+  height: 90rpx;
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
+  color: #ffffff;
+  font-size: 32rpx;
+  font-weight: bold;
+  border-radius: 45rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30rpx;
+  box-shadow: 0 8rpx 20rpx rgba(255, 107, 53, 0.3);
+}
+
+.register-btn.disabled {
+  opacity: 0.6;
+}
+
+.login-section {
+  text-align: center;
+}
+
+.login-hint {
+  font-size: 26rpx;
+  color: #999999;
+}
+
+.login-link {
+  font-size: 26rpx;
+  color: #ff6b35;
+  margin-left: 10rpx;
+  font-weight: bold;
+}
+

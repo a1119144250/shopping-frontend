@@ -1,0 +1,207 @@
+/* pages/login/login.wxss */
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 40rpx;
+  box-sizing: border-box;
+}
+
+.login-box {
+  background: #ffffff;
+  border-radius: 20rpx;
+  padding: 60rpx 40rpx;
+  box-shadow: 0 4rpx 20rpx rgba(255, 107, 53, 0.1);
+}
+
+/* Logo区域 */
+.logo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 60rpx;
+}
+
+.logo {
+  width: 120rpx;
+  height: 120rpx;
+  margin-bottom: 20rpx;
+}
+
+.logo-placeholder {
+  width: 120rpx;
+  height: 120rpx;
+  font-size: 100rpx;
+  line-height: 120rpx;
+  text-align: center;
+  margin-bottom: 20rpx;
+}
+
+.app-name {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 10rpx;
+}
+
+.welcome-text {
+  font-size: 28rpx;
+  color: #999999;
+}
+
+/* 表单区域 */
+.form-section {
+  margin-bottom: 40rpx;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  background: #f5f5f5;
+  border-radius: 10rpx;
+  padding: 0 20rpx;
+  margin-bottom: 30rpx;
+  height: 90rpx;
+}
+
+.input-label {
+  width: 50rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-icon {
+  width: 36rpx;
+  height: 36rpx;
+}
+
+.input-icon-text {
+  font-size: 40rpx;
+  line-height: 1;
+}
+
+.input-field {
+  flex: 1;
+  height: 90rpx;
+  font-size: 28rpx;
+  padding-left: 20rpx;
+}
+
+.input-action {
+  width: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eye-icon {
+  font-size: 40rpx;
+}
+
+.forgot-password {
+  text-align: right;
+  margin-bottom: 40rpx;
+}
+
+.forgot-password text {
+  font-size: 24rpx;
+  color: #ff6b35;
+}
+
+.login-btn {
+  width: 100%;
+  height: 90rpx;
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
+  color: #ffffff;
+  font-size: 32rpx;
+  font-weight: bold;
+  border-radius: 45rpx;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30rpx;
+  box-shadow: 0 8rpx 20rpx rgba(255, 107, 53, 0.3);
+}
+
+.login-btn.disabled {
+  opacity: 0.6;
+}
+
+.register-section {
+  text-align: center;
+}
+
+.register-hint {
+  font-size: 26rpx;
+  color: #999999;
+}
+
+.register-link {
+  font-size: 26rpx;
+  color: #ff6b35;
+  margin-left: 10rpx;
+  font-weight: bold;
+}
+
+/* 其他登录方式 */
+.other-login {
+  margin-top: 60rpx;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.line {
+  flex: 1;
+  height: 1rpx;
+  background: #e5e5e5;
+}
+
+.divider-text {
+  font-size: 24rpx;
+  color: #999999;
+  padding: 0 20rpx;
+}
+
+.other-login-methods {
+  display: flex;
+  justify-content: center;
+  gap: 60rpx;
+}
+
+.login-method {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.method-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  border: 2rpx solid #e5e5e5;
+  padding: 15rpx;
+  box-sizing: border-box;
+}
+
+.method-icon-text {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  border: 2rpx solid #e5e5e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+}
+
+.method-text {
+  font-size: 22rpx;
+  color: #999999;
+}
+

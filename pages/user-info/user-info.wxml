@@ -1,0 +1,133 @@
+<!--pages/user-info/user-info.wxml-->
+<view class="container">
+  <!-- 用户头像区域 -->
+  <view class="header-section">
+    <image class="user-avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+    <view class="user-name">{{userInfo.nickName || '未设置昵称'}}</view>
+    <view class="user-username" wx:if="{{userInfo.username}}">@{{userInfo.username}}</view>
+  </view>
+
+  <!-- 基本信息 -->
+  <view class="info-section">
+    <view class="section-title">基本信息</view>
+    
+    <view class="info-item" wx:if="{{userInfo.username}}">
+      <view class="info-label">
+        <image class="info-icon" src="/images/icons/user.png" mode="aspectFit"></image>
+        <text>用户名</text>
+      </view>
+      <view class="info-value">
+        <text>{{userInfo.username}}</text>
+        <text class="copy-btn" bindtap="handleCopy" data-text="{{userInfo.username}}">复制</text>
+      </view>
+    </view>
+
+    <view class="info-item" wx:if="{{userInfo.phone}}">
+      <view class="info-label">
+        <image class="info-icon" src="/images/icons/phone.png" mode="aspectFit"></image>
+        <text>手机号</text>
+      </view>
+      <view class="info-value">
+        <text>{{userInfo.phone}}</text>
+        <text class="copy-btn" bindtap="handleCopy" data-text="{{userInfo.phone}}">复制</text>
+      </view>
+    </view>
+
+    <view class="info-item" wx:if="{{userInfo.email}}">
+      <view class="info-label">
+        <image class="info-icon" src="/images/icons/email.png" mode="aspectFit"></image>
+        <text>邮箱</text>
+      </view>
+      <view class="info-value">
+        <text>{{userInfo.email}}</text>
+        <text class="copy-btn" bindtap="handleCopy" data-text="{{userInfo.email}}">复制</text>
+      </view>
+    </view>
+
+    <view class="info-item" wx:if="{{userInfo.id}}">
+      <view class="info-label">
+        <image class="info-icon" src="/images/icons/id.png" mode="aspectFit"></image>
+        <text>用户ID</text>
+      </view>
+      <view class="info-value">
+        <text>{{userInfo.id}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 账户信息 -->
+  <view class="info-section">
+    <view class="section-title">账户信息</view>
+    
+    <view class="info-item">
+      <view class="info-label">
+        <image class="info-icon" src="/images/icons/points.png" mode="aspectFit"></image>
+        <text>积分</text>
+      </view>
+      <view class="info-value">
+        <text class="highlight">{{userInfo.points || 0}}</text>
+      </view>
+    </view>
+
+    <view class="info-item">
+      <view class="info-label">
+        <image class="info-icon" src="/images/icons/coupon.png" mode="aspectFit"></image>
+        <text>优惠券</text>
+      </view>
+      <view class="info-value">
+        <text class="highlight">{{userInfo.coupons || 0}} 张</text>
+      </view>
+    </view>
+
+    <view class="info-item">
+      <view class="info-label">
+        <image class="info-icon" src="/images/icons/balance.png" mode="aspectFit"></image>
+        <text>余额</text>
+      </view>
+      <view class="info-value">
+        <text class="highlight">¥{{userInfo.balance || 0}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 登录信息 -->
+  <view class="info-section">
+    <view class="section-title">登录信息</view>
+    
+    <view class="info-item" wx:if="{{userInfo.createdAt}}">
+      <view class="info-label">
+        <image class="info-icon" src="/images/icons/time.png" mode="aspectFit"></image>
+        <text>注册时间</text>
+      </view>
+      <view class="info-value">
+        <text class="info-date">{{userInfo.createdAt}}</text>
+      </view>
+    </view>
+
+    <view class="info-item">
+      <view class="info-label">
+        <image class="info-icon" src="/images/icons/token.png" mode="aspectFit"></image>
+        <text>登录有效期</text>
+      </view>
+      <view class="info-value">
+        <text class="token-time" wx:if="{{tokenInfo.remainingDays > 0}}">剩余 {{tokenInfo.remainingDays}} 天 {{tokenInfo.remainingHours}} 小时</text>
+        <text class="token-time" wx:elif="{{tokenInfo.remainingHours > 0}}">剩余 {{tokenInfo.remainingHours}} 小时 {{tokenInfo.remainingMinutes}} 分钟</text>
+        <text class="token-time warning" wx:else>即将过期</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-section">
+    <button class="edit-btn" bindtap="handleEdit">
+      <image class="btn-icon" src="/images/icons/edit.png" mode="aspectFit"></image>
+      <text>编辑资料</text>
+    </button>
+    
+    <button class="logout-btn" bindtap="handleLogout">
+      <image class="btn-icon" src="/images/icons/logout.png" mode="aspectFit"></image>
+      <text>退出登录</text>
+    </button>
+  </view>
+</view>
+

@@ -5,7 +5,7 @@ const app = getApp()
 
 // API基础配置
 const API_CONFIG = {
-  baseUrl: 'http://localhost:8082', // 后端API地址
+  baseUrl: 'http://localhost:8081', // 后端API地址
   timeout: 10000,
   header: {
     'Content-Type': 'application/json'
@@ -42,7 +42,7 @@ function request(options) {
     }
     
     if (token) {
-      header.Authorization = `Bearer ${token}`
+      header.satoken = token  // 使用 satoken 而不是 Authorization: Bearer
     }
 
     console.log('🚀 准备发送 wx.request')
@@ -83,8 +83,15 @@ function request(options) {
           }
         } else if (res.statusCode === 401) {
           // 未授权，清除token并跳转登录
-          wx.removeStorageSync('token')
-          wx.removeStorageSync('userInfo')
+          const { userStorage } = require('./storage.js')
+          userStorage.clearUserInfo()
+          
+          // 清除全局登录状态
+          if (app && app.globalData) {
+            app.globalData.userInfo = null
+            app.globalData.isLoggingIn = false
+          }
+          
           wx.showToast({
             title: '请重新登录',
             icon: 'none'
@@ -206,10 +213,21 @@ function uploadFile(filePath, options = {}) {
 const API = {
   // 用户相关
   user: {
+    // 账号密码登录
     login: (data) => post('/user/login', data),
+    // 账号注册
     register: (data) => post('/user/register', data),
+    // 微信登录（保留，备用）
+    wxLogin: (data) => post('/user/wx-login', data),
+    // 手机号登录
+    phoneLogin: (data) => post('/user/phone-login', data),
+    // 发送验证码
+    sendVerifyCode: (phone) => post('/user/send-code', { phone }),
+    // 获取用户信息
     profile: () => get('/user/profile'),
+    // 更新用户信息
     updateProfile: (data) => put('/user/profile', data),
+    // 退出登录
     logout: () => post('/user/logout')
   },
 
