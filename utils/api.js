@@ -309,12 +309,12 @@ const API = {
 
   // 地址相关
   address: {
-    list: () => get('/addresses'),
-    detail: (id) => get(`/addresses/${id}`),
-    create: (data) => post('/addresses', data),
-    update: (id, data) => put(`/addresses/${id}`, data),
-    remove: (id) => del(`/addresses/${id}`),
-    setDefault: (id) => post(`/addresses/${id}/default`)
+    list: () => get('/address/addresses'),
+    detail: (id) => get(`/address/addresses/${id}`),
+    create: (data) => post('/address/addresses', data),
+    update: (id, data) => put(`/address/addresses/${id}`, data),
+    remove: (id) => del(`/address/addresses/${id}`),
+    setDefault: (id) => post(`/address/addresses/${id}/default`)
   },
 
   // 优惠券相关

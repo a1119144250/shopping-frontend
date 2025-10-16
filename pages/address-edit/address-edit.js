@@ -1,4 +1,7 @@
 // pages/address-edit/address-edit.js
+const { API } = require('../../utils/api.js')
+const { userStorage } = require('../../utils/storage.js')
+
 Page({
   data: {
     isEdit: false,
@@ -15,6 +18,11 @@ Page({
   },
 
   onLoad(options) {
+    // 检查登录状态
+    if (!this.checkLogin()) {
+      return
+    }
+    
     if (options.id) {
       this.setData({
         isEdit: true,
@@ -31,23 +39,76 @@ Page({
     }
   },
 
-  // 加载地址数据
-  loadAddressData(addressId) {
-    const addressList = wx.getStorageSync('addressList') || []
-    const address = addressList.find(item => item.id === addressId)
+  // 检查登录状态
+  checkLogin() {
+    const isLoggedIn = userStorage.isLoggedIn()
     
-    if (address) {
-      this.setData({
-        formData: {
-          name: address.name || '',
-          phone: address.phone || '',
-          region: address.region || '',
-          detail: address.detail || '',
-          tag: address.tag || '家',
-          isDefault: address.isDefault || false
+    if (!isLoggedIn) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再操作收货地址',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            // 跳转到登录页面
+            wx.redirectTo({
+              url: '/pages/login/login'
+            })
+          } else {
+            // 取消则返回上一页
+            wx.navigateBack({
+              delta: 1,
+              fail: () => {
+                // 如果没有上一页，跳转到首页
+                wx.switchTab({
+                  url: '/pages/index/index'
+                })
+              }
+            })
+          }
         }
       })
+      return false
     }
+    
+    return true
+  },
+
+  // 加载地址数据
+  loadAddressData(addressId) {
+    wx.showLoading({
+      title: '加载中...',
+      mask: true
+    })
+    
+    API.address.detail(addressId)
+      .then(address => {
+        wx.hideLoading()
+        if (address) {
+          this.setData({
+            formData: {
+              name: address.name || '',
+              phone: address.phone || '',
+              region: address.region || '',
+              detail: address.detail || '',
+              tag: address.tag || '家',
+              isDefault: address.isDefault || false
+            }
+          })
+        }
+      })
+      .catch(err => {
+        console.error('加载地址详情失败:', err)
+        wx.hideLoading()
+        wx.showToast({
+          title: '加载失败',
+          icon: 'none'
+        })
+        setTimeout(() => {
+          wx.navigateBack()
+        }, 1500)
+      })
   },
 
   // 事件处理
@@ -142,56 +203,58 @@ Page({
       return
     }
     
-    const addressData = {
-      ...this.data.formData,
-      id: this.data.addressId || this.generateId(),
-      createTime: Date.now(),
-      updateTime: Date.now()
-    }
-    
-    this.saveAddress(addressData)
+    this.saveAddress()
   },
 
   // 保存地址
-  saveAddress(addressData) {
-    let addressList = wx.getStorageSync('addressList') || []
-    
-    if (this.data.isEdit) {
-      // 编辑模式
-      const index = addressList.findIndex(item => item.id === this.data.addressId)
-      if (index > -1) {
-        addressList[index] = { ...addressList[index], ...addressData }
-      }
-    } else {
-      // 新增模式
-      addressList.unshift(addressData)
-    }
-    
-    // 如果设置为默认地址，取消其他地址的默认状态
-    if (addressData.isDefault) {
-      addressList.forEach(item => {
-        if (item.id !== addressData.id) {
-          item.isDefault = false
-        }
-      })
-      wx.setStorageSync('defaultAddress', addressData)
-    }
-    
-    wx.setStorageSync('addressList', addressList)
-    
-    wx.showToast({
-      title: '保存成功',
-      icon: 'success',
-      success: () => {
-        setTimeout(() => {
-          wx.navigateBack()
-        }, 1500)
-      }
+  saveAddress() {
+    wx.showLoading({
+      title: '保存中...',
+      mask: true
     })
-  },
-
-  // 生成唯一ID
-  generateId() {
-    return 'addr_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+    
+    const addressData = { ...this.data.formData }
+    const isSetDefault = addressData.isDefault
+    
+    // 根据编辑/新增模式调用不同的 API
+    const apiCall = this.data.isEdit 
+      ? API.address.update(this.data.addressId, addressData)
+      : API.address.create(addressData)
+    
+    apiCall
+      .then(result => {
+        // 如果设置为默认地址，需要调用 setDefault 接口
+        // 注意：后端可能在创建/更新时已经处理了默认地址逻辑
+        // 这里提供一个可选的显式设置默认地址的调用
+        if (isSetDefault && result && result.id) {
+          return API.address.setDefault(result.id)
+            .then(() => result)
+            .catch(err => {
+              console.warn('设置默认地址失败:', err)
+              return result // 即使设置默认失败，也返回结果
+            })
+        }
+        return result
+      })
+      .then(() => {
+        wx.hideLoading()
+        wx.showToast({
+          title: '保存成功',
+          icon: 'success',
+          success: () => {
+            setTimeout(() => {
+              wx.navigateBack()
+            }, 1500)
+          }
+        })
+      })
+      .catch(err => {
+        console.error('保存地址失败:', err)
+        wx.hideLoading()
+        wx.showToast({
+          title: '保存失败，请重试',
+          icon: 'none'
+        })
+      })
   }
 })

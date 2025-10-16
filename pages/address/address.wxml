@@ -10,15 +10,17 @@
             <text class="address-phone">{{item.phone}}</text>
             <view class="default-tag" wx:if="{{item.isDefault}}">默认</view>
           </view>
+          <view class="address-region">{{item.region}}</view>
           <text class="address-detail">{{item.detail}}</text>
+          <view class="address-tag">{{item.tag}}</view>
         </view>
         
         <view class="address-actions">
-          <view class="action-btn" bindtap="onEditAddress" data-address="{{item}}">
-            <image class="action-icon" src="/images/edit.png" mode="aspectFit"></image>
+          <view class="action-btn edit-btn" catchtap="onEditAddress" data-address="{{item}}">
+            <text class="action-text">编辑</text>
           </view>
-          <view class="action-btn" bindtap="onDeleteAddress" data-id="{{item.id}}">
-            <image class="action-icon" src="/images/delete.png" mode="aspectFit"></image>
+          <view class="action-btn delete-btn" catchtap="onDeleteAddress" data-id="{{item.id}}">
+            <text class="action-text">删除</text>
           </view>
         </view>
       </view>
@@ -27,7 +29,7 @@
 
   <!-- 空状态 -->
   <view class="empty-address" wx:else>
-    <image class="empty-icon" src="/images/empty-address.png" mode="aspectFit"></image>
+    <view class="empty-icon">📍</view>
     <text class="empty-text">暂无收货地址</text>
     <text class="empty-desc">添加收货地址，享受便捷配送服务</text>
   </view>

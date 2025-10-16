@@ -266,10 +266,26 @@ Page({
   onMenuTap(e) {
     const type = e.currentTarget.dataset.type
     
-    // 部分功能需要登录
-    const needLoginTypes = ['coupon', 'favorite']
-    if (needLoginTypes.includes(type) && !this.data.userInfo.nickName) {
-      this.showLoginTip()
+    // 检查登录状态
+    const { userStorage } = require('../../utils/storage.js')
+    const isLoggedIn = userStorage.isLoggedIn()
+    
+    // 需要登录的功能
+    const needLoginTypes = ['address', 'coupon', 'favorite']
+    if (needLoginTypes.includes(type) && !isLoggedIn) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再使用此功能',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/login/login'
+            })
+          }
+        }
+      })
       return
     }
     

@@ -1,4 +1,7 @@
 // pages/address/address.js
+const { API } = require('../../utils/api.js')
+const { userStorage } = require('../../utils/storage.js')
+
 Page({
   data: {
     addressList: [],
@@ -6,6 +9,11 @@ Page({
   },
 
   onLoad(options) {
+    // 检查登录状态
+    if (!this.checkLogin()) {
+      return
+    }
+    
     this.setData({
       fromPage: options.from || ''
     })
@@ -13,13 +21,74 @@ Page({
   },
 
   onShow() {
+    // 检查登录状态
+    if (!this.checkLogin()) {
+      return
+    }
+    
     this.loadAddressList()
+  },
+
+  // 检查登录状态
+  checkLogin() {
+    const isLoggedIn = userStorage.isLoggedIn()
+    
+    if (!isLoggedIn) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再查看收货地址',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            // 跳转到登录页面
+            wx.redirectTo({
+              url: '/pages/login/login'
+            })
+          } else {
+            // 取消则返回上一页
+            wx.navigateBack({
+              delta: 1,
+              fail: () => {
+                // 如果没有上一页，跳转到首页
+                wx.switchTab({
+                  url: '/pages/index/index'
+                })
+              }
+            })
+          }
+        }
+      })
+      return false
+    }
+    
+    return true
   },
 
   // 加载地址列表
   loadAddressList() {
-    const addressList = wx.getStorageSync('addressList') || []
-    this.setData({ addressList })
+    wx.showLoading({
+      title: '加载中...',
+      mask: true
+    })
+    
+    API.address.list()
+      .then(addressList => {
+        this.setData({ 
+          addressList: addressList || [] 
+        })
+        wx.hideLoading()
+      })
+      .catch(err => {
+        console.error('加载地址列表失败:', err)
+        wx.hideLoading()
+        wx.showToast({
+          title: '加载失败，请重试',
+          icon: 'none'
+        })
+        // 加载失败时显示空列表
+        this.setData({ addressList: [] })
+      })
   },
 
   // 事件处理
@@ -40,7 +109,6 @@ Page({
   },
 
   onEditAddress(e) {
-    e.stopPropagation()
     const address = e.currentTarget.dataset.address
     wx.navigateTo({
       url: `/pages/address-edit/address-edit?id=${address.id}`
@@ -48,7 +116,6 @@ Page({
   },
 
   onDeleteAddress(e) {
-    e.stopPropagation()
     const addressId = e.currentTarget.dataset.id
     
     wx.showModal({
@@ -64,28 +131,28 @@ Page({
 
   // 删除地址
   deleteAddress(addressId) {
-    let addressList = this.data.addressList
-    const deleteIndex = addressList.findIndex(item => item.id === addressId)
+    wx.showLoading({
+      title: '删除中...',
+      mask: true
+    })
     
-    if (deleteIndex > -1) {
-      const deletedAddress = addressList[deleteIndex]
-      addressList.splice(deleteIndex, 1)
-      
-      // 如果删除的是默认地址，设置第一个为默认
-      if (deletedAddress.isDefault && addressList.length > 0) {
-        addressList[0].isDefault = true
-        wx.setStorageSync('defaultAddress', addressList[0])
-      } else if (deletedAddress.isDefault) {
-        wx.removeStorageSync('defaultAddress')
-      }
-      
-      wx.setStorageSync('addressList', addressList)
-      this.setData({ addressList })
-      
-      wx.showToast({
-        title: '删除成功',
-        icon: 'success'
+    API.address.remove(addressId)
+      .then(() => {
+        wx.hideLoading()
+        wx.showToast({
+          title: '删除成功',
+          icon: 'success'
+        })
+        // 重新加载地址列表
+        this.loadAddressList()
       })
-    }
+      .catch(err => {
+        console.error('删除地址失败:', err)
+        wx.hideLoading()
+        wx.showToast({
+          title: '删除失败，请重试',
+          icon: 'none'
+        })
+      })
   }
 })
