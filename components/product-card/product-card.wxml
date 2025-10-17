@@ -32,7 +32,7 @@
       
       <!-- 加入购物车按钮 -->
       <view class="add-cart-wrapper">
-        <view class="add-cart-btn" bindtap="onAddToCart" data-product="{{product}}">
+        <view class="add-cart-btn" catchtap="onAddToCart" data-product="{{product}}">
           <text class="add-icon">+</text>
         </view>
       </view>

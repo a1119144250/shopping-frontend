@@ -147,32 +147,46 @@ Page({
   },
 
   // 提交订单API
-  submitOrder(orderData) {
-    return new Promise((resolve) => {
-      // 模拟API调用
-      setTimeout(() => {
-        // 模拟成功响应
-        resolve({
-          success: true,
-          orderId: 'ORDER_' + Date.now(),
-          message: '订单提交成功'
-        })
-      }, 1500)
-    })
+  async submitOrder(orderData) {
+    const { API } = require('../../utils/api.js')
+    
+    try {
+      // 构建后端需要的订单数据格式
+      const requestData = {
+        items: orderData.items.map(item => ({
+          productId: item.id,
+          productName: item.name,
+          productImage: item.image,
+          price: item.price,
+          count: item.count
+        })),
+        addressId: orderData.address.id,
+        couponId: orderData.coupon ? orderData.coupon.id : undefined,
+        remark: orderData.remark,
+        deliveryFee: parseFloat(orderData.deliveryFee),
+        goodsAmount: parseFloat(orderData.goodsAmount),
+        totalAmount: parseFloat(orderData.totalAmount)
+      }
+      
+      const result = await API.order.create(requestData)
+      
+      return {
+        success: true,
+        orderId: result.orderId || result.orderNo,
+        message: '订单提交成功'
+      }
+    } catch (error) {
+      console.error('提交订单失败:', error)
+      return {
+        success: false,
+        message: error.message || '提交订单失败'
+      }
+    }
   },
 
-  // 清除购物车中已下单的商品
+  // 清除购物车中已下单的商品（已废弃，后端会自动处理）
   clearOrderedItems() {
-    const cart = app.globalData.cart || []
-    const orderedItemIds = this.data.orderItems.map(item => item.id)
-    
-    // 过滤掉已下单的商品
-    const newCart = cart.filter(item => !orderedItemIds.includes(item.id))
-    
-    app.globalData.cart = newCart
-    app.updateCartInfo()
-    app.saveCartToStorage()
-    
+    // 不再使用本地购物车，后端会自动清除已下单的商品
     // 清除临时订单数据
     wx.removeStorageSync('orderData')
   }

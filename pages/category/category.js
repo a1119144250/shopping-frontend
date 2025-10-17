@@ -60,53 +60,16 @@ Page({
   },
 
   fetchCategories() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          {
-            id: 1,
-            name: '汉堡',
-            icon: '/images/category/burger.png',
-            description: '美味汉堡，满足你的味蕾',
-            count: 0
-          },
-          {
-            id: 2,
-            name: '披萨',
-            icon: '/images/category/pizza.png',
-            description: '正宗意式披萨',
-            count: 0
-          },
-          {
-            id: 3,
-            name: '炸鸡',
-            icon: '/images/category/chicken.png',
-            description: '香脆炸鸡，外酥内嫩',
-            count: 0
-          },
-          {
-            id: 4,
-            name: '饮品',
-            icon: '/images/category/drink.png',
-            description: '清爽饮品，解腻必备',
-            count: 0
-          },
-          {
-            id: 5,
-            name: '甜品',
-            icon: '/images/category/dessert.png',
-            description: '精美甜品，甜蜜时光',
-            count: 0
-          },
-          {
-            id: 6,
-            name: '小食',
-            icon: '/images/category/snack.png',
-            description: '休闲小食，随时享用',
-            count: 0
-          }
-        ])
-      }, 300)
+    const { API } = require('../../utils/api.js')
+    return API.product.categories().then(categories => {
+      // 添加 count 字段
+      return categories.map(cat => ({
+        ...cat,
+        count: 0
+      }))
+    }).catch(error => {
+      console.error('加载分类失败:', error)
+      return [] // 失败时返回空数组
     })
   },
 
@@ -133,14 +96,8 @@ Page({
     try {
       const products = await this.fetchProducts(categoryId, refresh ? 1 : this.data.page)
       
-      // 添加购物车数量信息
-      const productsWithCart = products.map(product => ({
-        ...product,
-        cartCount: this.getCartCount(product.id)
-      }))
-      
       this.setData({
-        products: refresh ? productsWithCart : [...this.data.products, ...productsWithCart],
+        products: refresh ? products : [...this.data.products, ...products],
         page: refresh ? 2 : this.data.page + 1,
         hasMore: products.length > 0,
         loading: false
@@ -156,83 +113,15 @@ Page({
   },
 
   fetchProducts(categoryId, page = 1) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // 模拟不同分类的商品数据
-        const productsByCategory = {
-          1: [ // 汉堡
-            {
-              id: 101,
-              name: '经典牛肉汉堡',
-              image: '/images/products/burger1.jpg',
-              price: 25.8,
-              originalPrice: 32.0,
-              description: '新鲜牛肉饼配生菜番茄',
-              sales: 1234,
-              rating: 4.8
-            },
-            {
-              id: 102,
-              name: '双层芝士汉堡',
-              image: '/images/products/burger2.jpg',
-              price: 32.8,
-              originalPrice: 38.0,
-              description: '双倍芝士，双倍满足',
-              sales: 876,
-              rating: 4.7
-            }
-          ],
-          2: [ // 披萨
-            {
-              id: 201,
-              name: '意式玛格丽特披萨',
-              image: '/images/products/pizza1.jpg',
-              price: 38.0,
-              originalPrice: 45.0,
-              description: '经典意式口味，芝士浓郁',
-              sales: 856,
-              rating: 4.9
-            },
-            {
-              id: 202,
-              name: '夏威夷披萨',
-              image: '/images/products/pizza2.jpg',
-              price: 42.0,
-              originalPrice: 48.0,
-              description: '菠萝火腿，酸甜可口',
-              sales: 654,
-              rating: 4.5
-            }
-          ],
-          3: [ // 炸鸡
-            {
-              id: 301,
-              name: '香辣炸鸡翅',
-              image: '/images/products/chicken1.jpg',
-              price: 18.8,
-              originalPrice: 22.0,
-              description: '外酥内嫩，香辣可口',
-              sales: 2156,
-              rating: 4.7
-            }
-          ],
-          4: [ // 饮品
-            {
-              id: 401,
-              name: '芒果气泡水',
-              image: '/images/products/drink1.jpg',
-              price: 12.0,
-              originalPrice: 15.0,
-              description: '清爽芒果味，解腻必备',
-              sales: 3421,
-              rating: 4.6
-            }
-          ]
-        }
-        
-        const products = productsByCategory[categoryId] || []
-        resolve(page === 1 ? products : []) // 模拟分页
-      }, 500)
+    const { API } = require('../../utils/api.js')
+    return API.product.categoryProducts(categoryId, { 
+      page, 
+      pageSize: 20 
+    }).then(res => {
+      return res.items || []
+    }).catch(error => {
+      console.error('加载商品失败:', error)
+      return [] // 失败时返回空数组
     })
   },
 
@@ -241,36 +130,9 @@ Page({
     this.loadProducts(this.data.currentCategoryId, false)
   },
 
-  // 获取商品在购物车中的数量
-  getCartCount(productId) {
-    const cartItem = app.globalData.cart.find(item => item.id === productId)
-    return cartItem ? cartItem.count : 0
-  },
-
-  // 更新购物车信息
+  // 更新购物车信息（已废弃，现在使用后端购物车）
   updateCartInfo() {
-    app.loadCartFromStorage()
-    
-    // 更新商品的购物车数量
-    const products = this.data.products.map(product => ({
-      ...product,
-      cartCount: this.getCartCount(product.id)
-    }))
-    
-    // 更新分类的购物车数量
-    const categories = this.data.categories.map(category => ({
-      ...category,
-      count: this.getCategoryCartCount(category.id)
-    }))
-    
-    this.setData({ products, categories })
-  },
-
-  // 获取分类在购物车中的商品数量
-  getCategoryCartCount(categoryId) {
-    // 这里需要根据实际的商品分类关系来计算
-    // 暂时返回0，实际项目中需要实现
-    return 0
+    // 不再使用本地购物车
   },
 
   // 事件处理
@@ -292,39 +154,109 @@ Page({
     })
   },
 
-  onAddToCart(e) {
-    e.stopPropagation()
+  async onAddToCart(e) {
+    if (e && e.stopPropagation) {
+      e.stopPropagation()
+    }
     const product = e.currentTarget.dataset.product
-    app.addToCart(product)
-    this.updateCartInfo()
+    const { userStorage } = require('../../utils/storage.js')
+    const { API } = require('../../utils/api.js')
     
-    wx.showToast({
-      title: '已加入购物车',
-      icon: 'success',
-      duration: 1000
-    })
+    // 检查是否登录
+    if (!userStorage.isLoggedIn()) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再加入购物车',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/login/login'
+            })
+          }
+        }
+      })
+      return
+    }
+    
+    // 已登录，调用后端API
+    try {
+      await API.cart.add({
+        productId: product.id,
+        count: 1
+      })
+      
+      this.updateCartInfo()
+      
+      wx.showToast({
+        title: '已加入购物车',
+        icon: 'success',
+        duration: 1000
+      })
+    } catch (error) {
+      console.error('加入购物车失败:', error)
+      wx.showToast({
+        title: error.message || '加入购物车失败',
+        icon: 'none'
+      })
+    }
   },
 
-  onCartPlus(e) {
-    e.stopPropagation()
+  async onCartPlus(e) {
+    if (e && e.stopPropagation) {
+      e.stopPropagation()
+    }
     const productId = e.currentTarget.dataset.id
     const product = this.data.products.find(p => p.id === productId)
+    const { userStorage } = require('../../utils/storage.js')
+    const { API } = require('../../utils/api.js')
+    
     if (product) {
-      app.addToCart({ ...product, count: 1 })
-      this.updateCartInfo()
+      // 检查是否登录
+      if (!userStorage.isLoggedIn()) {
+        wx.showModal({
+          title: '提示',
+          content: '请先登录后再加入购物车',
+          confirmText: '去登录',
+          cancelText: '取消',
+          success: (res) => {
+            if (res.confirm) {
+              wx.navigateTo({
+                url: '/pages/login/login'
+              })
+            }
+          }
+        })
+        return
+      }
+      
+      // 已登录，调用后端API
+      try {
+        await API.cart.add({
+          productId: product.id,
+          count: 1
+        })
+        this.updateCartInfo()
+      } catch (error) {
+        console.error('加入购物车失败:', error)
+        wx.showToast({
+          title: error.message || '操作失败',
+          icon: 'none'
+        })
+      }
     }
   },
 
   onCartMinus(e) {
-    e.stopPropagation()
-    const productId = e.currentTarget.dataset.id
-    const currentCount = this.getCartCount(productId)
-    if (currentCount > 1) {
-      app.updateCartItemCount(productId, currentCount - 1)
-    } else {
-      app.removeFromCart(productId)
+    if (e && e.stopPropagation) {
+      e.stopPropagation()
     }
-    this.updateCartInfo()
+    // 购物车减少功能需要在购物车页面操作
+    wx.showToast({
+      title: '请在购物车页面操作',
+      icon: 'none'
+    })
   },
 
   onCartTap() {

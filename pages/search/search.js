@@ -100,81 +100,15 @@ Page({
 
   // 搜索商品API
   searchProducts(keyword) {
-    return new Promise((resolve) => {
-      // 模拟搜索API
-      setTimeout(() => {
-        // 模拟商品数据
-        const allProducts = [
-          {
-            id: 1,
-            name: '经典牛肉汉堡',
-            image: '/images/products/burger1.jpg',
-            price: 25.8,
-            originalPrice: 32.0,
-            description: '新鲜牛肉饼配生菜番茄',
-            sales: 1234,
-            rating: 4.8
-          },
-          {
-            id: 2,
-            name: '意式玛格丽特披萨',
-            image: '/images/products/pizza1.jpg',
-            price: 38.0,
-            originalPrice: 45.0,
-            description: '经典意式口味，芝士浓郁',
-            sales: 856,
-            rating: 4.9
-          },
-          {
-            id: 3,
-            name: '香辣炸鸡翅',
-            image: '/images/products/chicken1.jpg',
-            price: 18.8,
-            originalPrice: 22.0,
-            description: '外酥内嫩，香辣可口',
-            sales: 2156,
-            rating: 4.7
-          },
-          {
-            id: 4,
-            name: '芒果气泡水',
-            image: '/images/products/drink1.jpg',
-            price: 12.0,
-            originalPrice: 15.0,
-            description: '清爽芒果味，解腻必备',
-            sales: 3421,
-            rating: 4.6
-          },
-          {
-            id: 5,
-            name: '双层芝士汉堡',
-            image: '/images/products/burger2.jpg',
-            price: 32.8,
-            originalPrice: 38.0,
-            description: '双倍芝士，双倍满足',
-            sales: 1876,
-            rating: 4.8
-          },
-          {
-            id: 6,
-            name: '夏威夷披萨',
-            image: '/images/products/pizza2.jpg',
-            price: 42.0,
-            originalPrice: 48.0,
-            description: '菠萝火腿，酸甜可口',
-            sales: 1234,
-            rating: 4.5
-          }
-        ]
-        
-        // 模糊搜索
-        const results = allProducts.filter(product => 
-          product.name.includes(keyword) || 
-          product.description.includes(keyword)
-        )
-        
-        resolve(results)
-      }, 800)
+    const { API } = require('../../utils/api.js')
+    return API.product.search(keyword, { 
+      page: 1, 
+      pageSize: 50 
+    }).then(res => {
+      return res.items || []
+    }).catch(error => {
+      console.error('搜索商品失败:', error)
+      return [] // 失败时返回空数组
     })
   },
 
@@ -219,16 +153,51 @@ Page({
   },
 
   // 添加到购物车
-  onAddToCart(e) {
-    e.stopPropagation()
+  async onAddToCart(e) {
+    if (e && e.stopPropagation) {
+      e.stopPropagation()
+    }
     const product = e.currentTarget.dataset.product
-    app.addToCart(product)
+    const { userStorage } = require('../../utils/storage.js')
+    const { API } = require('../../utils/api.js')
     
-    wx.showToast({
-      title: '已加入购物车',
-      icon: 'success',
-      duration: 1000
-    })
+    // 检查是否登录
+    if (!userStorage.isLoggedIn()) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再加入购物车',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/login/login'
+            })
+          }
+        }
+      })
+      return
+    }
+    
+    // 已登录，调用后端API
+    try {
+      await API.cart.add({
+        productId: product.id,
+        count: 1
+      })
+      
+      wx.showToast({
+        title: '已加入购物车',
+        icon: 'success',
+        duration: 1000
+      })
+    } catch (error) {
+      console.error('加入购物车失败:', error)
+      wx.showToast({
+        title: error.message || '加入购物车失败',
+        icon: 'none'
+      })
+    }
   },
 
   // 页面卸载时清除定时器

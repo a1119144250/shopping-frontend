@@ -75,123 +75,54 @@ Page({
 
   // 加载轮播图数据
   loadBanners() {
-    return new Promise((resolve) => {
-      // 模拟数据，实际项目中应该调用API
-      setTimeout(() => {
-        resolve([
-          {
-            id: 1,
-            image: '/images/banner1.jpg',
-            url: '/pages/product-detail/product-detail?id=1'
-          },
-          {
-            id: 2,
-            image: '/images/banner2.jpg',
-            url: '/pages/category/category?id=2'
-          },
-          {
-            id: 3,
-            image: '/images/banner3.jpg',
-            url: '/pages/product-detail/product-detail?id=3'
-          }
-        ])
-      }, 500)
+    const { API } = require('../../utils/api.js')
+    return API.common.banners().catch(error => {
+      console.error('加载轮播图失败:', error)
+      return [] // 失败时返回空数组
     })
   },
 
   // 加载分类数据
   loadCategories() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          { id: 1, name: '汉堡', icon: '/images/category/burger.png' },
-          { id: 2, name: '披萨', icon: '/images/category/pizza.png' },
-          { id: 3, name: '炸鸡', icon: '/images/category/chicken.png' },
-          { id: 4, name: '饮品', icon: '/images/category/drink.png' },
-          { id: 5, name: '甜品', icon: '/images/category/dessert.png' },
-          { id: 6, name: '小食', icon: '/images/category/snack.png' }
-        ])
-      }, 300)
+    const { API } = require('../../utils/api.js')
+    return API.product.categories().then(categories => {
+      // 只取前6个分类
+      return categories.slice(0, 6)
+    }).catch(error => {
+      console.error('加载分类失败:', error)
+      return [] // 失败时返回空数组
     })
   },
 
   // 加载推荐商品
   loadRecommendProducts() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          {
-            id: 1,
-            name: '经典牛肉汉堡',
-            image: '/images/products/burger1.jpg',
-            price: 25.8,
-            originalPrice: 32.0,
-            description: '新鲜牛肉饼配生菜番茄',
-            sales: 1234,
-            rating: 4.8
-          },
-          {
-            id: 2,
-            name: '意式玛格丽特披萨',
-            image: '/images/products/pizza1.jpg',
-            price: 38.0,
-            originalPrice: 45.0,
-            description: '经典意式口味，芝士浓郁',
-            sales: 856,
-            rating: 4.9
-          },
-          {
-            id: 3,
-            name: '香辣炸鸡翅',
-            image: '/images/products/chicken1.jpg',
-            price: 18.8,
-            originalPrice: 22.0,
-            description: '外酥内嫩，香辣可口',
-            sales: 2156,
-            rating: 4.7
-          },
-          {
-            id: 4,
-            name: '芒果气泡水',
-            image: '/images/products/drink1.jpg',
-            price: 12.0,
-            originalPrice: 15.0,
-            description: '清爽芒果味，解腻必备',
-            sales: 3421,
-            rating: 4.6
-          }
-        ])
-      }, 400)
+    const { API } = require('../../utils/api.js')
+    return API.product.list({ 
+      page: 1, 
+      pageSize: 4,
+      sortBy: 'rating',
+      sortOrder: 'desc'
+    }).then(res => {
+      return res.items || []
+    }).catch(error => {
+      console.error('加载推荐商品失败:', error)
+      return [] // 失败时返回空数组
     })
   },
 
   // 加载热销商品
   loadHotProducts() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          {
-            id: 5,
-            name: '双层芝士汉堡',
-            image: '/images/products/burger2.jpg',
-            price: 32.8,
-            originalPrice: 38.0,
-            description: '双倍芝士，双倍满足',
-            sales: 1876,
-            rating: 4.8
-          },
-          {
-            id: 6,
-            name: '夏威夷披萨',
-            image: '/images/products/pizza2.jpg',
-            price: 42.0,
-            originalPrice: 48.0,
-            description: '菠萝火腿，酸甜可口',
-            sales: 1234,
-            rating: 4.5
-          }
-        ])
-      }, 600)
+    const { API } = require('../../utils/api.js')
+    return API.product.list({ 
+      page: 1, 
+      pageSize: 10,
+      sortBy: 'sales',
+      sortOrder: 'desc'
+    }).then(res => {
+      return res.items || []
+    }).catch(error => {
+      console.error('加载热销商品失败:', error)
+      return [] // 失败时返回空数组
     })
   },
 
@@ -202,8 +133,15 @@ Page({
     this.setData({ loading: true })
     
     try {
-      // 模拟加载更多数据
-      const newProducts = await this.loadMoreHotProducts(this.data.page + 1)
+      const { API } = require('../../utils/api.js')
+      const res = await API.product.list({ 
+        page: this.data.page,
+        pageSize: 10,
+        sortBy: 'sales',
+        sortOrder: 'desc'
+      })
+      
+      const newProducts = res.items || []
       
       if (newProducts.length > 0) {
         this.setData({
@@ -220,32 +158,9 @@ Page({
     }
   },
 
-  loadMoreHotProducts(page) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        if (page > 3) {
-          resolve([]) // 模拟没有更多数据
-        } else {
-          resolve([
-            {
-              id: 6 + page,
-              name: `商品 ${6 + page}`,
-              image: '/images/products/default.jpg',
-              price: 20 + page * 5,
-              originalPrice: 25 + page * 5,
-              description: '美味商品描述',
-              sales: 100 * page,
-              rating: 4.5
-            }
-          ])
-        }
-      }, 800)
-    })
-  },
-
-  // 更新购物车信息
+  // 更新购物车信息（已废弃，现在使用后端购物车）
   updateCartInfo() {
-    app.loadCartFromStorage()
+    // 不再使用本地购物车
   },
 
   // 事件处理
@@ -282,15 +197,48 @@ Page({
     })
   },
 
-  onAddToCart(e) {
+  async onAddToCart(e) {
     const product = e.detail
-    app.addToCart(product)
+    const { userStorage } = require('../../utils/storage.js')
+    const { API } = require('../../utils/api.js')
     
-    wx.showToast({
-      title: '已加入购物车',
-      icon: 'success',
-      duration: 1500
-    })
+    // 检查是否登录
+    if (!userStorage.isLoggedIn()) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再加入购物车',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/login/login'
+            })
+          }
+        }
+      })
+      return
+    }
+    
+    // 已登录，调用后端API
+    try {
+      await API.cart.add({
+        productId: product.id,
+        count: 1
+      })
+      
+      wx.showToast({
+        title: '已加入购物车',
+        icon: 'success',
+        duration: 1500
+      })
+    } catch (error) {
+      console.error('加入购物车失败:', error)
+      wx.showToast({
+        title: error.message || '加入购物车失败',
+        icon: 'none'
+      })
+    }
   },
 
   onCartTap() {

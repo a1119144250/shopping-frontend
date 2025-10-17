@@ -48,49 +48,21 @@ Page({
   },
 
   fetchProductDetail(productId) {
-    return new Promise((resolve) => {
-      // 模拟数据
-      setTimeout(() => {
-        const products = {
-          1: {
-            id: 1,
-            name: '经典牛肉汉堡',
-            image: '/images/products/burger1.jpg',
-            images: [
-              '/images/products/burger1.jpg',
-              '/images/products/burger1-2.jpg',
-              '/images/products/burger1-3.jpg'
-            ],
-            price: 25.8,
-            originalPrice: 32.0,
-            description: '新鲜牛肉饼配生菜番茄，口感丰富',
-            detail: '精选优质牛肉，经过特殊腌制，搭配新鲜蔬菜和特制酱料，为您带来绝佳的味觉体验。每一口都是满满的幸福感。',
-            sales: 1234,
-            rating: 4.8,
-            category: '汉堡',
-            ingredients: ['牛肉饼', '生菜', '番茄', '洋葱', '芝士', '特制酱料'],
-            nutrition: {
-              calories: 520,
-              protein: 28,
-              fat: 25,
-              carbs: 45
-            }
-          },
-          101: {
-            id: 101,
-            name: '经典牛肉汉堡',
-            image: '/images/products/burger1.jpg',
-            price: 25.8,
-            originalPrice: 32.0,
-            description: '新鲜牛肉饼配生菜番茄',
-            detail: '精选优质牛肉，经过特殊腌制，搭配新鲜蔬菜和特制酱料。',
-            sales: 1234,
-            rating: 4.8
-          }
-        }
-        
-        resolve(products[productId] || products[1])
-      }, 500)
+    const { API } = require('../../utils/api.js')
+    return API.product.detail(productId).catch(error => {
+      console.error('加载商品详情失败:', error)
+      wx.showToast({
+        title: '加载失败',
+        icon: 'none'
+      })
+      // 返回一个空对象，避免页面崩溃
+      return {
+        id: productId,
+        name: '商品不存在',
+        image: '',
+        price: 0,
+        description: ''
+      }
     })
   },
 
@@ -155,18 +127,71 @@ Page({
     }
   },
 
-  onAddToCart() {
+  async onAddToCart() {
     const product = this.data.product
-    app.addToCart(product)
+    const { userStorage } = require('../../utils/storage.js')
+    const { API } = require('../../utils/api.js')
     
-    wx.showToast({
-      title: '已加入购物车',
-      icon: 'success',
-      duration: 1500
-    })
+    // 检查是否登录
+    if (!userStorage.isLoggedIn()) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再加入购物车',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/login/login'
+            })
+          }
+        }
+      })
+      return
+    }
+    
+    // 已登录，调用后端API
+    try {
+      await API.cart.add({
+        productId: product.id,
+        count: 1
+      })
+      
+      wx.showToast({
+        title: '已加入购物车',
+        icon: 'success',
+        duration: 1500
+      })
+    } catch (error) {
+      console.error('加入购物车失败:', error)
+      wx.showToast({
+        title: error.message || '加入购物车失败',
+        icon: 'none'
+      })
+    }
   },
 
   onBuyNow() {
+    const { userStorage } = require('../../utils/storage.js')
+    
+    // 检查是否登录
+    if (!userStorage.isLoggedIn()) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再购买',
+        confirmText: '去登录',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/login/login'
+            })
+          }
+        }
+      })
+      return
+    }
+    
     const product = this.data.product
     
     // 创建临时订单数据

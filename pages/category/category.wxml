@@ -56,11 +56,11 @@
                 </view>
                 <view class="product-actions">
                   <view class="cart-controls" wx:if="{{item.cartCount > 0}}">
-                    <view class="cart-btn cart-minus" bindtap="onCartMinus" data-id="{{item.id}}">-</view>
+                    <view class="cart-btn cart-minus" catchtap="onCartMinus" data-id="{{item.id}}">-</view>
                     <text class="cart-count">{{item.cartCount}}</text>
-                    <view class="cart-btn cart-plus" bindtap="onCartPlus" data-id="{{item.id}}">+</view>
+                    <view class="cart-btn cart-plus" catchtap="onCartPlus" data-id="{{item.id}}">+</view>
                   </view>
-                  <view class="add-cart-btn" wx:else bindtap="onAddToCart" data-product="{{item}}">
+                  <view class="add-cart-btn" wx:else catchtap="onAddToCart" data-product="{{item}}">
                     <text>+</text>
                   </view>
                 </view>

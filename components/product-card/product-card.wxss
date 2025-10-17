@@ -60,7 +60,12 @@
   margin-bottom: 8rpx;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2; /* 最多显示2行 */
+  word-break: break-all; /* 强制换行 */
+  line-height: 1.4;
+  max-height: 2.8em; /* 2行的高度 */
 }
 
 .product-desc {
@@ -70,7 +75,12 @@
   margin-bottom: 15rpx;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1; /* 最多显示1行 */
+  word-break: break-all; /* 强制换行 */
+  line-height: 1.4;
+  max-height: 1.4em; /* 1行的高度 */
 }
 
 /* 评分和销量 */

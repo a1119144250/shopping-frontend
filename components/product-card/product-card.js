@@ -34,13 +34,36 @@ Component({
 
     // 商品点击事件
     onProductClick(e) {
-      e.stopPropagation()
+      if (e && e.stopPropagation) {
+        e.stopPropagation()
+      }
       this.triggerEvent('productclick', this.data.product)
     },
 
     // 加入购物车事件
     onAddToCart(e) {
-      e.stopPropagation()
+      if (e && e.stopPropagation) {
+        e.stopPropagation()
+      }
+      
+      // 检查登录状态
+      const { userStorage } = require('../../utils/storage.js')
+      if (!userStorage.isLoggedIn()) {
+        wx.showModal({
+          title: '提示',
+          content: '请先登录后再加入购物车',
+          confirmText: '去登录',
+          cancelText: '取消',
+          success: (res) => {
+            if (res.confirm) {
+              wx.navigateTo({
+                url: '/pages/login/login'
+              })
+            }
+          }
+        })
+        return
+      }
       
       // 添加点击动画效果
       const animation = wx.createAnimation({

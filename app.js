@@ -27,9 +27,6 @@ App({
   // 全局数据
   globalData: {
     userInfo: null,
-    cart: [], // 购物车数据
-    totalPrice: 0, // 购物车总价
-    totalCount: 0, // 购物车商品总数
     selectedAddress: null, // 选中的收货地址
     baseUrl: 'https://api.example.com', // API基础地址
     version: '1.0.0',
@@ -110,76 +107,34 @@ App({
     }
   },
 
-  // 全局方法
-  // 添加商品到购物车
+  // ===== 以下本地购物车相关方法已废弃，现在使用后端购物车 =====
+  // 保留这些方法是为了防止旧代码调用时报错
+  
   addToCart(product) {
-    const cart = this.globalData.cart
-    const existItem = cart.find(item => item.id === product.id)
-    
-    if (existItem) {
-      existItem.count += product.count || 1
-    } else {
-      cart.push({
-        ...product,
-        count: product.count || 1
-      })
-    }
-    
-    this.updateCartInfo()
-    this.saveCartToStorage()
+    console.warn('本地购物车已废弃，请使用后端购物车')
   },
 
-  // 从购物车移除商品
   removeFromCart(productId) {
-    const cart = this.globalData.cart
-    const index = cart.findIndex(item => item.id === productId)
-    
-    if (index > -1) {
-      cart.splice(index, 1)
-      this.updateCartInfo()
-      this.saveCartToStorage()
-    }
+    console.warn('本地购物车已废弃，请使用后端购物车')
   },
 
-  // 更新购物车商品数量
   updateCartItemCount(productId, count) {
-    const cart = this.globalData.cart
-    const item = cart.find(item => item.id === productId)
-    
-    if (item) {
-      if (count <= 0) {
-        this.removeFromCart(productId)
-      } else {
-        item.count = count
-        this.updateCartInfo()
-        this.saveCartToStorage()
-      }
-    }
+    console.warn('本地购物车已废弃，请使用后端购物车')
   },
 
-  // 清空购物车
   clearCart() {
-    this.globalData.cart = []
-    this.updateCartInfo()
-    this.saveCartToStorage()
+    console.warn('本地购物车已废弃，请使用后端购物车')
   },
 
-  // 更新购物车统计信息
   updateCartInfo() {
-    const cart = this.globalData.cart
-    this.globalData.totalCount = cart.reduce((sum, item) => sum + item.count, 0)
-    this.globalData.totalPrice = cart.reduce((sum, item) => sum + (item.price * item.count), 0)
+    console.warn('本地购物车已废弃，请使用后端购物车')
   },
 
-  // 保存购物车到本地存储
   saveCartToStorage() {
-    wx.setStorageSync('cart', this.globalData.cart)
+    console.warn('本地购物车已废弃，请使用后端购物车')
   },
 
-  // 从本地存储加载购物车
   loadCartFromStorage() {
-    const cart = wx.getStorageSync('cart') || []
-    this.globalData.cart = cart
-    this.updateCartInfo()
+    console.warn('本地购物车已废弃，请使用后端购物车')
   }
 })

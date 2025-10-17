@@ -67,7 +67,7 @@
                 <text class="price-current">¥{{item.price}}</text>
                 <text class="price-original" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
               </view>
-              <view class="add-cart-btn" bindtap="onAddToCart" data-product="{{item}}">
+              <view class="add-cart-btn" catchtap="onAddToCart" data-product="{{item}}">
                 <text>+</text>
               </view>
             </view>

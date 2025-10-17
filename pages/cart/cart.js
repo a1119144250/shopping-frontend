@@ -1,5 +1,7 @@
 // pages/cart/cart.js
 const app = getApp()
+const { API } = require('../../utils/api.js')
+const { userStorage } = require('../../utils/storage.js')
 
 Page({
   data: {
@@ -8,7 +10,8 @@ Page({
     isAllSelected: false,
     selectedCount: 0,
     totalPrice: 0,
-    loading: false
+    loading: false,
+    isLoggedIn: false
   },
 
   onLoad() {
@@ -22,7 +25,17 @@ Page({
         selected: 2
       })
     }
-    this.loadCartData()
+    
+    // 检查登录状态
+    const isLoggedIn = userStorage.isLoggedIn()
+    this.setData({ isLoggedIn })
+    
+    if (isLoggedIn) {
+      this.loadCartData()
+    } else {
+      // 未登录，加载本地购物车
+      this.loadLocalCart()
+    }
   },
 
   onPullDownRefresh() {
@@ -33,59 +46,65 @@ Page({
     }, 1000)
   },
 
-  // 加载购物车数据
-  loadCartData() {
-    app.loadCartFromStorage()
-    const cartItems = app.globalData.cart.map(item => ({
-      ...item,
-      selected: true // 默认全选
-    }))
+  // 加载购物车数据（从后端API）
+  async loadCartData() {
+    if (this.data.loading) return
     
-    this.setData({ cartItems })
-    this.calculateTotal()
+    this.setData({ loading: true })
+    
+    try {
+      const cartList = await API.cart.list()
+      const cartItems = cartList.map(item => ({
+        ...item,
+        id: item.productId, // 确保有 id 字段
+        name: item.productName,
+        image: item.productImage,
+        selected: item.selected !== false // 默认选中
+      }))
+      
+      this.setData({ 
+        cartItems,
+        loading: false 
+      })
+      this.calculateTotal()
+    } catch (error) {
+      console.error('加载购物车失败:', error)
+      this.setData({ loading: false })
+      
+      // 如果是未登录错误，显示提示
+      if (error.message && error.message.includes('登录')) {
+        this.setData({ isLoggedIn: false })
+      }
+    }
+  },
+
+  // 加载本地购物车（未登录时）
+  loadLocalCart() {
+    // 未登录时显示空购物车
+    this.setData({ 
+      cartItems: [],
+      selectedCount: 0,
+      totalPrice: 0,
+      isAllSelected: false
+    })
   },
 
   // 加载推荐商品
   async loadRecommendProducts() {
     try {
-      const products = await this.fetchRecommendProducts()
-      this.setData({ recommendProducts: products })
+      const res = await API.product.list({ 
+        page: 1, 
+        pageSize: 4,
+        sortBy: 'sales',
+        sortOrder: 'desc'
+      })
+      this.setData({ 
+        recommendProducts: res.items || [] 
+      })
     } catch (error) {
       console.error('加载推荐商品失败:', error)
+      // 推荐商品加载失败不影响主流程
     }
-  },
-
-  fetchRecommendProducts() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          {
-            id: 501,
-            name: '香辣鸡腿堡',
-            image: '/images/products/burger3.jpg',
-            price: 28.8
-          },
-          {
-            id: 502,
-            name: '奥尔良烤翅',
-            image: '/images/products/chicken2.jpg',
-            price: 22.0
-          },
-          {
-            id: 503,
-            name: '柠檬汽水',
-            image: '/images/products/drink2.jpg',
-            price: 8.0
-          },
-          {
-            id: 504,
-            name: '提拉米苏',
-            image: '/images/products/dessert1.jpg',
-            price: 35.0
-          }
-        ])
-      }, 300)
-    })
   },
 
   // 计算总价和选中数量
@@ -102,21 +121,22 @@ Page({
     })
   },
 
-  // 更新购物车到全局数据
-  updateGlobalCart() {
-    const cart = this.data.cartItems.map(item => ({
-      id: item.id,
-      name: item.name,
-      image: item.image,
-      price: item.price,
-      originalPrice: item.originalPrice,
-      description: item.description,
-      count: item.count
-    }))
-    
-    app.globalData.cart = cart
-    app.updateCartInfo()
-    app.saveCartToStorage()
+  // 更新购物车到后端
+  async updateCartItem(cartId, data) {
+    try {
+      await API.cart.update(cartId, data)
+    } catch (error) {
+      console.error('更新购物车失败:', error)
+      wx.showToast({
+        title: '操作失败',
+        icon: 'none'
+      })
+    }
+  },
+
+  // 更新本地购物车（已废弃）
+  updateLocalCart() {
+    // 不再使用本地购物车
   },
 
   // 事件处理
@@ -129,6 +149,13 @@ Page({
     
     this.setData({ cartItems })
     this.calculateTotal()
+    
+    // 如果已登录，更新后端
+    if (this.data.isLoggedIn) {
+      cartItems.forEach(item => {
+        this.updateCartItem(item.id, { selected: isAllSelected })
+      })
+    }
   },
 
   onItemSelect(e) {
@@ -142,10 +169,20 @@ Page({
     
     this.setData({ cartItems })
     this.calculateTotal()
+    
+    // 如果已登录，更新后端
+    if (this.data.isLoggedIn) {
+      const item = cartItems.find(i => i.id === itemId)
+      if (item) {
+        this.updateCartItem(item.id, { selected: item.selected })
+      }
+    }
   },
 
   onCountMinus(e) {
-    e.stopPropagation()
+    if (e && e.stopPropagation) {
+      e.stopPropagation()
+    }
     const itemId = e.currentTarget.dataset.id
     const cartItems = this.data.cartItems.map(item => {
       if (item.id === itemId && item.count > 1) {
@@ -156,11 +193,22 @@ Page({
     
     this.setData({ cartItems })
     this.calculateTotal()
-    this.updateGlobalCart()
+    
+    // 更新购物车
+    if (this.data.isLoggedIn) {
+      const item = cartItems.find(i => i.id === itemId)
+      if (item) {
+        this.updateCartItem(item.id, { count: item.count })
+      }
+    } else {
+      this.updateLocalCart()
+    }
   },
 
   onCountPlus(e) {
-    e.stopPropagation()
+    if (e && e.stopPropagation) {
+      e.stopPropagation()
+    }
     const itemId = e.currentTarget.dataset.id
     const cartItems = this.data.cartItems.map(item => {
       if (item.id === itemId) {
@@ -171,28 +219,62 @@ Page({
     
     this.setData({ cartItems })
     this.calculateTotal()
-    this.updateGlobalCart()
+    
+    // 更新购物车
+    if (this.data.isLoggedIn) {
+      const item = cartItems.find(i => i.id === itemId)
+      if (item) {
+        this.updateCartItem(item.id, { count: item.count })
+      }
+    } else {
+      this.updateLocalCart()
+    }
   },
 
   onItemDelete(e) {
-    e.stopPropagation()
+    if (e && e.stopPropagation) {
+      e.stopPropagation()
+    }
     const itemId = e.currentTarget.dataset.id
     
     wx.showModal({
       title: '确认删除',
       content: '确定要删除这个商品吗？',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
-          const cartItems = this.data.cartItems.filter(item => item.id !== itemId)
-          this.setData({ cartItems })
-          this.calculateTotal()
-          this.updateGlobalCart()
-          
-          wx.showToast({
-            title: '已删除',
-            icon: 'success',
-            duration: 1000
-          })
+          if (this.data.isLoggedIn) {
+            // 已登录，调用后端API删除
+            try {
+              await API.cart.remove(itemId)
+              const cartItems = this.data.cartItems.filter(item => item.id !== itemId)
+              this.setData({ cartItems })
+              this.calculateTotal()
+              
+              wx.showToast({
+                title: '已删除',
+                icon: 'success',
+                duration: 1000
+              })
+            } catch (error) {
+              console.error('删除失败:', error)
+              wx.showToast({
+                title: '删除失败',
+                icon: 'none'
+              })
+            }
+          } else {
+            // 未登录，删除本地购物车
+            const cartItems = this.data.cartItems.filter(item => item.id !== itemId)
+            this.setData({ cartItems })
+            this.calculateTotal()
+            this.updateLocalCart()
+            
+            wx.showToast({
+              title: '已删除',
+              icon: 'success',
+              duration: 1000
+            })
+          }
         }
       }
     })
@@ -204,21 +286,46 @@ Page({
     wx.showModal({
       title: '确认清空',
       content: '确定要清空购物车吗？',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
-          this.setData({
-            cartItems: [],
-            selectedCount: 0,
-            totalPrice: 0,
-            isAllSelected: false
-          })
-          app.clearCart()
-          
-          wx.showToast({
-            title: '已清空',
-            icon: 'success',
-            duration: 1000
-          })
+          if (this.data.isLoggedIn) {
+            // 已登录，调用后端API清空
+            try {
+              await API.cart.clear()
+              this.setData({
+                cartItems: [],
+                selectedCount: 0,
+                totalPrice: 0,
+                isAllSelected: false
+              })
+              
+              wx.showToast({
+                title: '已清空',
+                icon: 'success',
+                duration: 1000
+              })
+            } catch (error) {
+              console.error('清空失败:', error)
+              wx.showToast({
+                title: '清空失败',
+                icon: 'none'
+              })
+            }
+          } else {
+            // 未登录，无购物车可清空
+            this.setData({
+              cartItems: [],
+              selectedCount: 0,
+              totalPrice: 0,
+              isAllSelected: false
+            })
+            
+            wx.showToast({
+              title: '已清空',
+              icon: 'success',
+              duration: 1000
+            })
+          }
         }
       }
     })
@@ -244,7 +351,29 @@ Page({
     })
   },
 
+  onLogin() {
+    wx.navigateTo({
+      url: '/pages/login/login'
+    })
+  },
+
   onCheckout() {
+    if (!this.data.isLoggedIn) {
+      wx.showModal({
+        title: '提示',
+        content: '请先登录后再结算',
+        confirmText: '去登录',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: '/pages/login/login'
+            })
+          }
+        }
+      })
+      return
+    }
+
     if (this.data.selectedCount === 0) {
       wx.showToast({
         title: '请选择商品',
